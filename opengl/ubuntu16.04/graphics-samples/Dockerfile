@@ -2,6 +2,7 @@
 # https://github.com/NVIDIAGameWorks/GraphicsSamples
 
 # docker build -t graphics-samples .
+# xhost +si:localuser:root
 # docker run --runtime=nvidia -ti --rm -e DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix graphics-samples
 
 FROM nvidia/opengl:1.0-glvnd-devel-ubuntu16.04
