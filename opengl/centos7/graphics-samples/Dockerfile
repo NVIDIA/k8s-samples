@@ -7,6 +7,8 @@
 
 FROM nvidia/opengl:1.0-glvnd-devel-centos7
 
+ENV NVIDIA_DRIVER_CAPABILITIES ${NVIDIA_DRIVER_CAPABILITIES},display
+
 RUN yum install -y \
         git \
 	gcc-c++ \
