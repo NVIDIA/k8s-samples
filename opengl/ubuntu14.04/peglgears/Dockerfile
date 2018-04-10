@@ -6,6 +6,8 @@
 
 FROM nvidia/opengl:1.0-glvnd-devel-ubuntu14.04
 
+ENV NVIDIA_REQUIRE_DRIVER "driver>=390"
+
 RUN apt-get update && apt-get install -y --no-install-recommends \
         ca-certificates \
         curl \
