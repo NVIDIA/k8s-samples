@@ -6,6 +6,8 @@
 
 FROM nvidia/opengl:1.0-glvnd-devel-centos7
 
+ENV NVIDIA_REQUIRE_DRIVER "driver>=390"
+
 RUN yum install -y \
         curl \
 	make \
