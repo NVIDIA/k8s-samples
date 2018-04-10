@@ -17,6 +17,8 @@ ARG LIBJPEG_VERSION=1.5.2
 ARG WEBSOCKIFY_VERSION=0.8.0
 ARG NOVNC_VERSION=1.0.0-beta
 
+ENV NVIDIA_DRIVER_CAPABILITIES ${NVIDIA_DRIVER_CAPABILITIES},display
+
 RUN apt-get update && apt-get install -y --no-install-recommends \
         ca-certificates \
         curl \

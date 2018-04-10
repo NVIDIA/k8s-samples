@@ -6,6 +6,8 @@
 
 FROM nvidia/opengl:1.0-glvnd-devel-ubuntu14.04
 
+ENV NVIDIA_DRIVER_CAPABILITIES ${NVIDIA_DRIVER_CAPABILITIES},display
+
 RUN apt-get update && apt-get install -y --no-install-recommends \
         git \
         ca-certificates \
