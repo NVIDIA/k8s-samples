@@ -23,7 +23,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 RUN git clone https://github.com/NVIDIAGameWorks/GraphicsSamples.git /opt/demos && \
     cd /opt/demos && \
-    git checkout 7ca1360cc547dc3011e2f202554b42fda65eca6d && \
+    git checkout e82e141516ca86961fd151cc944730fe0be29dea && \
     cd /opt/demos/samples/build/linux64 && make -j"$(nproc)" release && \
     rm -rf /opt/demos/samples/build/linux64
 
