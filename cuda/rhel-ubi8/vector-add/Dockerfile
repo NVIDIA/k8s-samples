@@ -13,6 +13,4 @@ WORKDIR /usr/local/cuda-10.2
 RUN git clone https://github.com/NVIDIA/cuda-samples.git && \
     cd cuda-samples && make -j"$(nproc)" -k || true 
 
-ENV NVIDIA_VISIBLE_DEVICES all
-
-CMD ./Samples/vectorAdd_nvrtc/vectorAdd_nvrtc
+CMD ./cuda-samples/Samples/vectorAdd_nvrtc/vectorAdd_nvrtc
