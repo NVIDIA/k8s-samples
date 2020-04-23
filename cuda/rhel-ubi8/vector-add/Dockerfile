@@ -14,4 +14,14 @@ RUN cd /usr/local/cuda-10.2 && \
 
 WORKDIR /usr/local/cuda-10.2/cuda-samples/Samples/vectorAdd_nvrtc
 
+LABEL io.k8s.display-name="NVIDIA Validation Container"
+LABEL name="NVIDIA Validation Container"
+LABEL vendor="NVIDIA"
+LABEL version="1.0.0"
+LABEL release="N/A"
+LABEL summary="NVIDIA Container to Validate GPU Support"
+LABEL description="See summary"
+
+COPY ./LICENSE ./licenses/LICENSE
+
 CMD ./vectorAdd_nvrtc
