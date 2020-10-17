@@ -1,0 +1,23 @@
+# docker build --pull \
+#    --build-arg CUDA_VER=10.2 \
+#    --build-arg BASE_DIST=ubuntu18.04 \
+#    --tag nvidia/samples/vectoradd-cuda10.2 --file Dockerfile .
+#
+ARG BASE_DIST
+ARG CUDA_VER
+FROM nvidia/cuda:${CUDA_VER}-devel-${BASE_DIST} AS builder
+
+ARG CUDA_VER
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    cuda-samples-$(echo ${CUDA_VER} | sed -e 's/\./-/') && \
+    rm -rf /var/lib/apt/lists/*
+
+WORKDIR /usr/local/cuda/samples/0_Simple/vectorAdd/
+RUN make
+
+FROM nvidia/cuda:${CUDA_VER}-base-${BASE_DIST}
+LABEL io.k8s.display-name="NVIDIA CUDA vectorAdd Sample"
+
+COPY --from=builder /usr/local/cuda/samples/bin/x86_64/linux/release/vectorAdd /tmp/vectorAdd
+
+ENTRYPOINT ["/tmp/vectorAdd"]
