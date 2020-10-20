@@ -70,7 +70,16 @@ WORKDIR /usr/local/cuda/samples/0_Simple/vectorAdd/
 RUN make
 
 FROM nvidia/cuda:${CUDA_VER}-base-${BASE_DIST}
-LABEL io.k8s.display-name="NVIDIA CUDA vectorAdd Sample"
+LABEL io.k8s.display-name="NVIDIA CUDA vectorAdd sample"
+LABEL name="NVIDIA CUDA vectorAdd sample"
+LABEL vendor="NVIDIA"
+LABEL version="1.0.0"
+LABEL release="N/A"
+LABEL summary="NVIDIA container to validate GPU support"
+LABEL description="See summary"
+
+COPY ./LICENSE ./licenses/LICENSE
+
 
 COPY --from=builder /usr/local/cuda/samples/bin/x86_64/linux/release/vectorAdd /tmp/vectorAdd
 
