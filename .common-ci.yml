@@ -1,0 +1,141 @@
+# Copyright (c) 2021, NVIDIA CORPORATION.  All rights reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+default:
+  image: docker:stable
+  services:
+    - docker:stable-dind
+
+variables:
+  IMAGE_NAME: "cuda-sample"
+  DOCKERHUB_REGISTRY: "registry-1.docker.io"
+
+# Define the following dummy targets for specifying make targets through the DISTRIBUTION variable
+.distribution-ubuntu18:
+  variables:
+    DISTRIBUTION: ubuntu18.04
+
+.distribution-ubi8:
+  variables:
+    DISTRIBUTION: ubi8
+
+.sample-vectoradd:
+  variables:
+    SAMPLE: vectorAdd
+
+# The .build step forms the base of the image builds with each variant
+# defined as a build-${VARIANT} step.
+.build:
+  stage: build
+  variables:
+    REGISTRY: "${CI_REGISTRY_IMAGE}"
+    VERSION: "${CI_COMMIT_SHA}"
+  before_script:
+    - apk add --no-cache make bash
+    - docker login -u "${CI_REGISTRY_USER}" -p "${CI_REGISTRY_PASSWORD}" "${CI_REGISTRY}"
+  script:
+    - make build-${DISTRIBUTION}
+    - make push-${DISTRIBUTION}
+
+build-vectoradd-ubuntu18:
+  extends:
+    - .build
+    - .distribution-ubuntu18
+    - .sample-vectoradd
+
+build-vectoradd-ubi8:
+  extends:
+    - .build
+    - .distribution-ubi8
+    - .sample-vectoradd
+
+# .deploy forms the base of the deployment jobs which push images to the CI registry.
+# This is extended with the version to be deployed (e.g. the SHA or TAG) and the
+# target os.
+.deploy:
+  stage: deploy
+  before_script:
+    - apk add --no-cache make bash
+    # Pull the built image from the CI registry
+    - docker login -u "${CI_REGISTRY_USER}" -p "${CI_REGISTRY_PASSWORD}" "${CI_REGISTRY}"
+    - make REGISTRY=${CI_REGISTRY_IMAGE} pull-${DISTRIBUTION}
+  script:
+    # Log in to the "output" registry, tag the image and push the image
+    - docker login -u "${OUT_REGISTRY_USER}" -p "${OUT_REGISTRY_TOKEN}" "${OUT_REGISTRY}"
+    - make REGISTRY=${CI_REGISTRY_IMAGE} tag-${DISTRIBUTION}
+    - make IMAGE=${OUT_IMAGE} push-${DISTRIBUTION}
+
+.deploy:ci:
+  extends: .deploy
+  variables:
+    OUT_REGISTRY_USER: ${CI_REGISTRY_USER}
+    OUT_REGISTRY_TOKEN: ${CI_REGISTRY_PASSWORD}
+    OUT_REGISTRY: ${CI_REGISTRY}
+    OUT_IMAGE: ${CI_REGISTRY_IMAGE}/${IMAGE_NAME}
+
+deploy:ci-vectoradd-ubuntu18:
+  extends:
+    - .deploy:ci
+    - .distribution-ubuntu18
+    - .sample-vectoradd
+  dependencies:
+    - build-vectoradd-ubuntu18
+
+deploy:ci-vectoradd-ubi8:
+  extends:
+    - .deploy:ci
+    - .distribution-ubuntu18
+    - .sample-vectoradd
+  dependencies:
+    - build-vectoradd-ubi8
+
+# A release job is a deployment job that has a different output version / image
+.release:
+  extends: .deploy
+  stage: release
+  variables:
+    # We use the CI_COMMIT_REF_SLUG as the release version as this covers tags and non-tags (for staging releases)
+    VERSION: "${CI_COMMIT_REF_SLUG}"
+
+# Define a staging release step that pushes an image to an internal "staging" repository
+# This is triggered for all pipelines (i.e. not only tags) to test the pipeline steps
+# outside of the release process.
+.release:staging:
+  extends: .release
+  variables:
+    OUT_REGISTRY_USER: ${CI_REGISTRY_USER}
+    OUT_REGISTRY_TOKEN: ${CI_REGISTRY_PASSWORD}
+    OUT_REGISTRY: ${CI_REGISTRY}
+    OUT_IMAGE: ${CI_REGISTRY_IMAGE}/staging/${IMAGE_NAME}
+
+.release:external:
+  extends: .release
+  only:
+    - tags
+
+release:staging-vectoradd-ubuntu18:
+  extends:
+    - .release:staging
+    - .distribution-ubuntu18
+    - .sample-vectoradd
+  dependencies:
+    - deploy:ci-vectoradd-ubuntu18
+
+release:staging-vectoradd-ubi8:
+  extends:
+    - .release:staging
+    - .distribution-ubi8
+    - .sample-vectoradd
+  dependencies:
+    - deploy:ci-vectoradd-ubi8
