@@ -1,0 +1,48 @@
+# Copyright (c) 2021, NVIDIA CORPORATION.  All rights reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+ARG BASE_DIST
+ARG CUDA_VER
+FROM nvidia/cuda:${CUDA_VER}-devel-${BASE_DIST} AS builder
+
+ARG CUDA_VER
+RUN dnf update -y && \
+    dnf install -y  \
+        cuda-samples-$(echo ${CUDA_VER} | sed -e 's/\./-/') && \
+    dnf clean all
+
+WORKDIR /build
+
+ARG SAMPLE_NAME
+ENV SAMPLE_NAME ${SAMPLE_NAME}
+RUN cd $(find /usr/local/cuda/samples -iname "${SAMPLE_NAME}") && \
+    make build && \
+    cp $(find /usr/local/cuda/samples/bin/x86_64/linux/release/ -iname "${SAMPLE_NAME}") /build/${SAMPLE_NAME}
+
+FROM nvidia/cuda:${CUDA_VER}-base-${BASE_DIST}
+ARG SAMPLE_NAME
+LABEL io.k8s.display-name="NVIDIA CUDA ${SAMPLE_NAME} sample"
+LABEL name="NVIDIA CUDA ${SAMPLE_NAME} sample"
+LABEL vendor="NVIDIA"
+LABEL version="1.0.0"
+LABEL release="N/A"
+LABEL summary="NVIDIA container to validate GPU support"
+LABEL description="See summary"
+
+COPY ./LICENSE ./licenses/LICENSE
+
+COPY --from=builder /build/${SAMPLE_NAME} /tmp/${SAMPLE_NAME}
+
+RUN ln -s /tmp/${SAMPLE_NAME} /tmp/sample
+ENTRYPOINT ["/tmp/sample"]
