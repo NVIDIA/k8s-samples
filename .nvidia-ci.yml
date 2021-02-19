@@ -48,9 +48,9 @@ stages:
     - apk add --no-cache python3 python3-dev py3-pip py3-wheel libmagic
     # Pull the built image from the CI registry
     - docker login -u "${CI_REGISTRY_USER}" -p "${CI_REGISTRY_PASSWORD}" "${CI_REGISTRY}"
-    - make REGISTRY=${CI_REGISTRY_IMAGE} pull-${DISTRIBUTION}
+    - make DISTRIBUTION=${DISTRIBUTION} pull
     # Tag the image as ${OUT_IMAGE}:${OUT_IMAGE_TAG} for scanning in contamer
-    - make REGISTRY=${CI_REGISTRY_IMAGE} tag-${DISTRIBUTION}
+    - make DISTRIBUTION=${DISTRIBUTION} tag
     - git clone https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab-master.nvidia.com/sectooling/scanning/contamer.git
     - pip3 install -r contamer/requirements.txt
   script:
@@ -68,6 +68,12 @@ scan-vectoradd-ubi8:
     - .scan
     - .distribution-ubi8
     - .sample-vectoradd
+
+scan-nbody-ubuntu18:
+  extends:
+    - .scan
+    - .distribution-ubuntu18
+    - .sample-nbody
 
 # Define the external release steps for NGC and Dockerhub
 .release:ngc:
@@ -104,6 +110,16 @@ release:ngc-vectoradd-ubi8:
     - deploy:ci-vectoradd-ubi8
     - scan-vectoradd-ubi8
 
+release:ngc-nbody-untagged:
+  extends:
+    - .release:ngc
+    - .distribution-ubuntu18
+    - .sample-nbody
+    - .nbody-untagged
+  dependencies:
+    - deploy:ci-nbody-ubuntu18
+    - scan-nbody-ubuntu18
+
 release:dockerhub-vectoradd-ubuntu18:
   extends:
     - .release:ngc
@@ -121,3 +137,13 @@ release:dockerhub-vectoradd-ubi8:
   dependencies:
     - deploy:ci-vectoradd-ubi8
     - scan-vectoradd-ubi8
+
+release:dockerhub-nbody-untagged:
+  extends:
+    - .release:ngc
+    - .distribution-ubuntu18
+    - .sample-nbody
+    - .nbody-untagged
+  dependencies:
+    - deploy:ci-nbody-ubuntu18
+    - scan-nbody-ubuntu18

@@ -41,14 +41,16 @@ DEFAULT_DISTRIBUTION := ubuntu18.04
 
 LOWER_CASE_SAMPLE := $(shell echo $(SAMPLE) | tr '[:upper:]' '[:lower:]')
 
-BUILD_TARGETS := $(patsubst %, build-%, $(DISTRIBUTIONS))
-PULL_TARGETS := $(patsubst %, pull-%, $(DISTRIBUTIONS))
-PUSH_TARGETS := $(patsubst %, push-%, $(DISTRIBUTIONS))
-TAG_TARGETS := $(patsubst %, tag-%, $(DISTRIBUTIONS))
+.PHONY: build pull push tag
+
+BUILD_TARGETS := $(patsubst %, .build-%, $(DISTRIBUTIONS))
+PULL_TARGETS := $(patsubst %, .pull-%, $(DISTRIBUTIONS))
+PUSH_TARGETS := $(patsubst %, .push-%, $(DISTRIBUTIONS))
+TAG_TARGETS := $(patsubst %, .tag-%, $(DISTRIBUTIONS))
 TEST_TARGETS := $(patsubst %, test-%, $(DISTRIBUTIONS))
 
-# TODO: Find a way to remove this duplication
-%: DISTRIBUTION = $(*)
+DISTRIBUTION ?= $(DEFAULT_DISTRIBUTION)
+%: %-$(DEFAULT_DISTRIBUTION)
 
 # Define the docker image name and tag
 SHORT_IMAGE_TAG = $(LOWER_CASE_SAMPLE)-cuda$(CUDA_VERSION)
@@ -56,8 +58,8 @@ IMAGE_TAG = $(SHORT_IMAGE_TAG)-$(DISTRIBUTION)
 
 SAMPLE_IMAGE_NAME = $(IMAGE):$(IMAGE_TAG)
 
-build: build-$(DEFAULT_DISTRIBUTION)
-$(BUILD_TARGETS): build-%:
+build: .build-$(DEFAULT_DISTRIBUTION)
+$(BUILD_TARGETS): .build-%:
 	@echo "Building $(SAMPLE) for $(DISTRIBUTION)"
 	$(DOCKER) build \
 		--build-arg BASE_DIST=$(DISTRIBUTION) \
@@ -67,22 +69,29 @@ $(BUILD_TARGETS): build-%:
 		-f cuda/Dockerfile.$(DISTRIBUTION) \
 		cuda
 
-push: push-$(DEFAULT_DISTRIBUTION)
-$(PUSH_TARGETS): push-%:
-	$(DOCKER) push $(SAMPLE_IMAGE_NAME)
-
-push-$(DEFAULT_DISTRIBUTION): push-short
-push-short: OUT_IMAGE_TAG = $(SHORT_IMAGE_TAG)
-push-short: OUT_IMAGE = $(IMAGE)
-push-short: tag-$(DEFAULT_DISTRIBUTION)
-	$(DOCKER) push $(IMAGE):$(SHORT_IMAGE_TAG)
-
-pull: pull-$(DEFAULT_DISTRIBUTION)
-$(PULL_TARGETS): pull-%:
+pull: .pull-$(DEFAULT_DISTRIBUTION)
+$(PULL_TARGETS): .pull-%:
 	$(DOCKER) pull $(SAMPLE_IMAGE_NAME)
 
 OUT_IMAGE ?= $(IMAGE)
 OUT_IMAGE_TAG ?= $(IMAGE_TAG)
-tag: tag-$(DEFAULT_DISTRIBUTION)
-$(TAG_TARGETS): tag-%:
+
+push: .push-$(DEFAULT_DISTRIBUTION)
+.push-$(DEFAULT_DISTRIBUTION): DISTRIBUTION ?= $(DEFAULT_DISTRIBUTION)
+$(PUSH_TARGETS): .push-%: .tag-%
+	$(DOCKER) push $(OUT_IMAGE):$(OUT_IMAGE_TAG)
+
+.push-$(DEFAULT_DISTRIBUTION): .push-short
+.push-short: DISTRIBUTION ?= $(DEFAULT_DISTRIBUTION)
+.push-short: .tag-short
+	$(DOCKER) push $(OUT_IMAGE):$(SHORT_IMAGE_TAG)
+
+tag: .tag-$(DEFAULT_DISTRIBUTION)
+.tag-$(DEFAULT_DISTRIBUTION): DISTRIBUTION ?= $(DEFAULT_DISTRIBUTION)
+$(TAG_TARGETS): .tag-%:
 	$(DOCKER) tag $(SAMPLE_IMAGE_NAME) $(OUT_IMAGE):$(OUT_IMAGE_TAG)
+
+.tag-$(DEFAULT_DISTRIBUTION): .tag-short
+.tag-short: DISTRIBUTION ?= $(DEFAULT_DISTRIBUTION)
+.tag-short:
+	$(DOCKER) tag $(SAMPLE_IMAGE_NAME) $(OUT_IMAGE):$(SHORT_IMAGE_TAG)

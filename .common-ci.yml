@@ -19,6 +19,7 @@ default:
 
 variables:
   IMAGE_NAME: "cuda-sample"
+  REGISTRY: "${CI_REGISTRY_IMAGE}"
   DOCKERHUB_REGISTRY: "registry-1.docker.io"
 
 # Define the following dummy targets for specifying make targets through the DISTRIBUTION variable
@@ -34,6 +35,10 @@ variables:
   variables:
     SAMPLE: vectorAdd
 
+.sample-nbody:
+  variables:
+    SAMPLE: nbody
+
 # The .build step forms the base of the image builds with each variant
 # defined as a build-${VARIANT} step.
 .build:
@@ -45,8 +50,8 @@ variables:
     - apk add --no-cache make bash
     - docker login -u "${CI_REGISTRY_USER}" -p "${CI_REGISTRY_PASSWORD}" "${CI_REGISTRY}"
   script:
-    - make build-${DISTRIBUTION}
-    - make push-${DISTRIBUTION}
+    - make DISTRIBUTION=${DISTRIBUTION} build
+    - make DISTRIBUTION=${DISTRIBUTION} push
 
 build-vectoradd-ubuntu18:
   extends:
@@ -60,6 +65,12 @@ build-vectoradd-ubi8:
     - .distribution-ubi8
     - .sample-vectoradd
 
+build-nbody-ubuntu18:
+  extends:
+    - .build
+    - .distribution-ubuntu18
+    - .sample-nbody
+
 # .deploy forms the base of the deployment jobs which push images to the CI registry.
 # This is extended with the version to be deployed (e.g. the SHA or TAG) and the
 # target os.
@@ -69,12 +80,12 @@ build-vectoradd-ubi8:
     - apk add --no-cache make bash
     # Pull the built image from the CI registry
     - docker login -u "${CI_REGISTRY_USER}" -p "${CI_REGISTRY_PASSWORD}" "${CI_REGISTRY}"
-    - make REGISTRY=${CI_REGISTRY_IMAGE} pull-${DISTRIBUTION}
+    - make DISTRIBUTION=${DISTRIBUTION} pull
   script:
     # Log in to the "output" registry, tag the image and push the image
     - docker login -u "${OUT_REGISTRY_USER}" -p "${OUT_REGISTRY_TOKEN}" "${OUT_REGISTRY}"
-    - make REGISTRY=${CI_REGISTRY_IMAGE} tag-${DISTRIBUTION}
-    - make IMAGE=${OUT_IMAGE} push-${DISTRIBUTION}
+    - make DISTRIBUTION=${DISTRIBUTION} tag
+    - make DISTRIBUTION=${DISTRIBUTION} push
 
 .deploy:ci:
   extends: .deploy
@@ -100,6 +111,14 @@ deploy:ci-vectoradd-ubi8:
   dependencies:
     - build-vectoradd-ubi8
 
+deploy:ci-nbody-ubuntu18:
+  extends:
+    - .deploy:ci
+    - .distribution-ubuntu18
+    - .sample-nbody
+  dependencies:
+    - build-nbody-ubuntu18
+
 # A release job is a deployment job that has a different output version / image
 .release:
   extends: .deploy
@@ -124,6 +143,10 @@ deploy:ci-vectoradd-ubi8:
   only:
     - tags
 
+.nbody-untagged:
+  variables:
+    OUT_IMAGE_TAG: "nbody"
+
 release:staging-vectoradd-ubuntu18:
   extends:
     - .release:staging
@@ -139,3 +162,12 @@ release:staging-vectoradd-ubi8:
     - .sample-vectoradd
   dependencies:
     - deploy:ci-vectoradd-ubi8
+
+release:staging-nbody-untagged:
+  extends:
+    - .release:staging
+    - .distribution-ubuntu18
+    - .sample-nbody
+    - .nbody-untagged
+  dependencies:
+    - deploy:ci-nbody-ubuntu18
