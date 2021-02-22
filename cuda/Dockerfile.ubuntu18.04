@@ -18,8 +18,13 @@ FROM nvidia/cuda:${CUDA_VER}-devel-${BASE_DIST} AS builder
 
 ARG CUDA_VER
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    cuda-samples-$(echo ${CUDA_VER} | sed -e 's/\./-/') && \
-    rm -rf /var/lib/apt/lists/*
+        cuda-samples-$(echo ${CUDA_VER} | sed -e 's/\./-/') \
+    # The nbody sample requires libGL, libGLU, and libglut
+        freeglut3-dev \
+        libgl1-mesa-dev \
+        libglu1-mesa-dev \
+    && \
+        rm -rf /var/lib/apt/lists/*
 
 WORKDIR /build
 
