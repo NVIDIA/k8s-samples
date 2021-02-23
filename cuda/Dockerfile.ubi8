@@ -19,7 +19,8 @@ FROM nvidia/cuda:${CUDA_VER}-devel-${BASE_DIST} AS builder
 ARG CUDA_VER
 RUN dnf update -y && \
     dnf install -y  \
-        cuda-samples-$(echo ${CUDA_VER} | sed -e 's/\./-/') && \
+        cuda-samples-$(echo ${CUDA_VER} | sed -e 's/\./-/' | sed -e 's/\.[0-9]\+//' ) \
+    && \
     dnf clean all
 
 WORKDIR /build
