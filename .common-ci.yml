@@ -83,10 +83,10 @@ build-nbody-ubuntu18:
     - docker login -u "${CI_REGISTRY_USER}" -p "${CI_REGISTRY_PASSWORD}" "${CI_REGISTRY}"
     - make DISTRIBUTION=${DISTRIBUTION} pull
   script:
-    # Log in to the "output" registry, tag the image and push the image
-    - 'echo "Logging in to output registry ${OUT_REGISTRY} as ${OUT_REGISTRY_USER#\$}"'
-    - docker login -u "${OUT_REGISTRY_USER#\$}" -p "${OUT_REGISTRY_TOKEN}" "${OUT_REGISTRY}"
     - make DISTRIBUTION=${DISTRIBUTION} tag
+    # Log in to the "output" registry, tag the image and push the image
+    - 'echo "Logging in to output registry ${OUT_REGISTRY}"'
+    - docker login -u "${OUT_REGISTRY_USER#\$}" -p "${OUT_REGISTRY_TOKEN}" "${OUT_REGISTRY}"
     - make DISTRIBUTION=${DISTRIBUTION} push
 
 .deploy:ci:
