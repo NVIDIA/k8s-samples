@@ -79,12 +79,12 @@ build-nbody-ubuntu18:
   before_script:
     - apk add --no-cache make bash
     # Pull the built image from the CI registry
-    - 'echo "Loging in to CI registry: ${CI_REGISTRY}"'
+    - 'echo "Logging in to CI registry ${CI_REGISTRY} as ${CI_REGISTRY_USER}"'
     - docker login -u "${CI_REGISTRY_USER}" -p "${CI_REGISTRY_PASSWORD}" "${CI_REGISTRY}"
     - make DISTRIBUTION=${DISTRIBUTION} pull
   script:
     # Log in to the "output" registry, tag the image and push the image
-    - 'echo "Loging in to output registry: ${OUT_REGISTRY}"'
+    - 'echo "Logging in to output registry ${OUT_REGISTRY} as ${OUT_REGISTRY_USER}"'
     - docker login -u "${OUT_REGISTRY_USER}" -p "${OUT_REGISTRY_TOKEN}" "${OUT_REGISTRY}"
     - make DISTRIBUTION=${DISTRIBUTION} tag
     - make DISTRIBUTION=${DISTRIBUTION} push
