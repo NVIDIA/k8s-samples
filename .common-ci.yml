@@ -20,7 +20,7 @@ default:
 variables:
   IMAGE_NAME: "cuda-sample"
   REGISTRY: "${CI_REGISTRY_IMAGE}"
-  DOCKERHUB_REGISTRY: "registry-1.docker.io"
+  DOCKERHUB_REGISTRY: "docker.io"
 
 # Define the following dummy targets for specifying make targets through the DISTRIBUTION variable
 .distribution-ubuntu18:
@@ -86,6 +86,7 @@ build-nbody-ubuntu18:
     - make DISTRIBUTION=${DISTRIBUTION} tag
     # Log in to the "output" registry, tag the image and push the image
     - 'echo "Logging in to output registry ${OUT_REGISTRY}"'
+    - docker logout
     - docker login -u "${OUT_REGISTRY_USER#\$}" -p "${OUT_REGISTRY_TOKEN}" "${OUT_REGISTRY}"
     - make DISTRIBUTION=${DISTRIBUTION} push
 
