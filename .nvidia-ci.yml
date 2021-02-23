@@ -122,7 +122,7 @@ release:ngc-nbody-untagged:
 
 release:dockerhub-vectoradd-ubuntu18:
   extends:
-    - .release:ngc
+    - .release:dockerhub
     - .distribution-ubuntu18
     - .sample-vectoradd
   dependencies:
@@ -131,7 +131,7 @@ release:dockerhub-vectoradd-ubuntu18:
 
 release:dockerhub-vectoradd-ubi8:
   extends:
-    - .release:ngc
+    - .release:dockerhub
     - .distribution-ubi8
     - .sample-vectoradd
   dependencies:
@@ -140,7 +140,7 @@ release:dockerhub-vectoradd-ubi8:
 
 release:dockerhub-nbody-untagged:
   extends:
-    - .release:ngc
+    - .release:dockerhub
     - .distribution-ubuntu18
     - .sample-nbody
     - .nbody-untagged
