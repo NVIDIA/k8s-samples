@@ -87,7 +87,7 @@ build-nbody-ubuntu18:
     # Log in to the "output" registry, tag the image and push the image
     - 'echo "Logging in to output registry ${OUT_REGISTRY}"'
     - docker logout
-    - docker login -u "${OUT_REGISTRY_USER#\$}" -p "${OUT_REGISTRY_TOKEN}" "${OUT_REGISTRY}"
+    - docker login -u "${OUT_REGISTRY_USER}" -p "${OUT_REGISTRY_TOKEN}" "${OUT_REGISTRY}"
     - make DISTRIBUTION=${DISTRIBUTION} push
 
 .deploy:ci:
