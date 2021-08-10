@@ -28,7 +28,7 @@ endif
 
 # Define the CUDA version for which we build the images.
 # This can be overridden
-CUDA_VERSION ?= 11.2.1
+CUDA_VERSION ?= 11.4.1
 
 # The Makefile describes the build process for a single CUDA sample: e.g. `vectorAdd`
 ifeq ($(SAMPLE),)
