@@ -36,7 +36,7 @@ ifeq ($(SAMPLE),)
 	SAMPLE := vectorAdd
 endif
 
-DISTRIBUTIONS := ubuntu18.04 ubi8
+DISTRIBUTIONS := ubuntu18.04 ubuntu20.04 ubi8
 DEFAULT_DISTRIBUTION := ubuntu18.04
 
 LOWER_CASE_SAMPLE := $(shell echo $(SAMPLE) | tr '[:upper:]' '[:lower:]')
@@ -58,7 +58,12 @@ IMAGE_TAG = $(SHORT_IMAGE_TAG)-$(DISTRIBUTION)
 
 SAMPLE_IMAGE_NAME = $(IMAGE):$(IMAGE_TAG)
 
-build: .build-$(DEFAULT_DISTRIBUTION)
+.build-ubuntu%: DOCKERFILE_SUFFIX := ubuntu
+
+.build-ubi8: DOCKERFILE_SUFFIX := ubi8
+.build-ubi8: DISTRIBUTION := ubi8
+
+build: .build-$(DISTRIBUTION)
 $(BUILD_TARGETS): .build-%:
 	@echo "Building $(SAMPLE) for $(DISTRIBUTION)"
 	$(DOCKER) build \
@@ -66,7 +71,7 @@ $(BUILD_TARGETS): .build-%:
 		--build-arg CUDA_VER=$(CUDA_VERSION) \
 		--build-arg SAMPLE_NAME=$(SAMPLE) \
 		-t $(SAMPLE_IMAGE_NAME) \
-		-f cuda/Dockerfile.$(DISTRIBUTION) \
+		-f cuda/Dockerfile.$(DOCKERFILE_SUFFIX) \
 		cuda
 
 pull: .pull-$(DEFAULT_DISTRIBUTION)
