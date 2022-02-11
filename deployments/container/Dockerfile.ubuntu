@@ -28,11 +28,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 WORKDIR /build
 
+ARG TARGETARCH
 ARG SAMPLE_NAME
 ENV SAMPLE_NAME ${SAMPLE_NAME}
 RUN cd $(find /usr/local/cuda/samples -iname "${SAMPLE_NAME}") && \
     make build && \
-    cp $(find /usr/local/cuda/samples/bin/x86_64/linux/release/ -iname "${SAMPLE_NAME}") /build/${SAMPLE_NAME}
+    cp $(find /usr/local/cuda/samples/bin/ -iname "${SAMPLE_NAME}") /build/${SAMPLE_NAME}
 
 FROM nvidia/cuda:${CUDA_VERSION}-base-${BASE_DIST}
 ARG SAMPLE_NAME

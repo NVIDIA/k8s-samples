@@ -17,8 +17,7 @@ ARG CUDA_VERSION
 FROM nvidia/cuda:${CUDA_VERSION}-devel-${BASE_DIST} AS builder
 
 ARG CUDA_VERSION
-RUN dnf update -y && \
-    dnf install -y  \
+RUN dnf install -y  \
         cuda-samples-$(echo ${CUDA_VERSION} | sed -e 's/\./-/' | sed -e 's/\.[0-9]\+//' ) \
     && \
     dnf clean all
@@ -29,7 +28,7 @@ ARG SAMPLE_NAME
 ENV SAMPLE_NAME ${SAMPLE_NAME}
 RUN cd $(find /usr/local/cuda/samples -iname "${SAMPLE_NAME}") && \
     make build && \
-    cp $(find /usr/local/cuda/samples/bin/x86_64/linux/release/ -iname "${SAMPLE_NAME}") /build/${SAMPLE_NAME}
+    cp $(find /usr/local/cuda/samples/bin/ -iname "${SAMPLE_NAME}") /build/${SAMPLE_NAME}
 
 FROM nvidia/cuda:${CUDA_VERSION}-base-${BASE_DIST}
 ARG SAMPLE_NAME
