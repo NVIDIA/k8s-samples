@@ -15,188 +15,139 @@
 default:
   image: docker:stable
   services:
-    - docker:stable-dind
+    - name: docker:stable-dind
+      command: ["--experimental"]
 
 variables:
-  IMAGE_NAME: "cuda-sample"
-  REGISTRY: "${CI_REGISTRY_IMAGE}"
-  DOCKERHUB_REGISTRY: "docker.io"
+  GIT_SUBMODULE_STRATEGY: recursive
 
-# Define the following dummy targets for specifying make targets through the DISTRIBUTION variable
-.distribution-ubuntu18:
+stages:
+  - image
+  - lint
+  - go-checks
+  - go-build
+  - unit-tests
+  - package-build
+  - image-build
+  - test
+  - scan
+  - aws_kube_setup
+  - integration_tests
+  - e2e_tests
+  - aws_kube_clean
+  - release
+
+# Define the distribution targets
+.dist-ubuntu18.04:
   variables:
-    DISTRIBUTION: ubuntu18.04
+    DIST: ubuntu18.04
 
-.distribution-ubuntu20:
+.dist-ubuntu20.04:
   variables:
-    DISTRIBUTION: ubuntu20.04
+    DIST: ubuntu20.04
 
-.distribution-ubi8:
+.dist-ubi8:
   variables:
-    DISTRIBUTION: ubi8
+    DIST: ubi8
 
+# Define the sample targets
 .sample-vectoradd:
   variables:
     SAMPLE: vectorAdd
+    LOWER_CASE_SAMPLE: vectoradd
 
 .sample-nbody:
   variables:
     SAMPLE: nbody
+    LOWER_CASE_SAMPLE: nbody
 
-# The .build step forms the base of the image builds with each variant
-# defined as a build-${VARIANT} step.
-.build:
-  stage: build
-  variables:
-    REGISTRY: "${CI_REGISTRY_IMAGE}"
-    VERSION: "${CI_COMMIT_SHA}"
-  before_script:
-    - apk add --no-cache make bash
-    - docker login -u "${CI_REGISTRY_USER}" -p "${CI_REGISTRY_PASSWORD}" "${CI_REGISTRY}"
-  script:
-    - make DISTRIBUTION=${DISTRIBUTION} build
-    - make DISTRIBUTION=${DISTRIBUTION} push
-
-build-vectoradd-ubuntu18:
-  extends:
-    - .build
-    - .distribution-ubuntu18
-    - .sample-vectoradd
-
-build-vectoradd-ubuntu20:
-  extends:
-    - .build
-    - .distribution-ubuntu20
-    - .sample-vectoradd
-
-build-vectoradd-ubi8:
-  extends:
-    - .build
-    - .distribution-ubi8
-    - .sample-vectoradd
-
-build-nbody-ubuntu18:
-  extends:
-    - .build
-    - .distribution-ubuntu18
-    - .sample-nbody
-
-# .deploy forms the base of the deployment jobs which push images to the CI registry.
+# .release forms the base of the deployment jobs which push images to the CI registry.
 # This is extended with the version to be deployed (e.g. the SHA or TAG) and the
 # target os.
-.deploy:
-  stage: deploy
+.release:
+  stage:
+    release
+  variables:
+    # Define the source image for the release
+    IMAGE_NAME: "${CI_REGISTRY_IMAGE}/cuda-samples"
+    VERSION: "${CI_COMMIT_SHORT_SHA}"
+    IMAGE_TAG: "${LOWER_CASE_SAMPLE}-${CI_COMMIT_SHORT_SHA}-${DIST}"
+    # OUT_IMAGE_VERSION is overridden for external releases
+    OUT_IMAGE_VERSION: "${CI_COMMIT_SHORT_SHA}"
+    OUT_IMAGE_TAG: "${LOWER_CASE_SAMPLE}-${OUT_IMAGE_VERSION}-${DIST}"
   before_script:
+    # We ensure that the OUT_IMAGE_VERSION is set
+    - 'echo Version: ${OUT_IMAGE_VERSION} ; [[ -n "${OUT_IMAGE_VERSION}" ]] || exit 1'
+
+    # In the case where we are deploying a different version to the CI_COMMIT_SHA, we
+    # need to tag the image.
+    # Note: a leading 'v' is stripped from the version if present
     - apk add --no-cache make bash
-    # Pull the built image from the CI registry
-    - 'echo "Logging in to CI registry ${CI_REGISTRY} as ${CI_REGISTRY_USER}"'
+    - 'echo "Logging in to CI registry ${CI_REGISTRY}"'
     - docker login -u "${CI_REGISTRY_USER}" -p "${CI_REGISTRY_PASSWORD}" "${CI_REGISTRY}"
-    - make DISTRIBUTION=${DISTRIBUTION} pull
+    - docker pull "${IMAGE_NAME}:${IMAGE_TAG}"
   script:
-    - make DISTRIBUTION=${DISTRIBUTION} tag
+    - docker tag "${IMAGE_NAME}:${IMAGE_TAG}" "${OUT_IMAGE_NAME}:${OUT_IMAGE_TAG}"
     # Log in to the "output" registry, tag the image and push the image
     - 'echo "Logging in to output registry ${OUT_REGISTRY}"'
     - docker logout
     - docker login -u "${OUT_REGISTRY_USER}" -p "${OUT_REGISTRY_TOKEN}" "${OUT_REGISTRY}"
-    - make DISTRIBUTION=${DISTRIBUTION} push
-
-.deploy:ci:
-  extends: .deploy
-  variables:
-    OUT_REGISTRY_USER: "${CI_REGISTRY_USER}"
-    OUT_REGISTRY_TOKEN: "${CI_REGISTRY_PASSWORD}"
-    OUT_REGISTRY: "${CI_REGISTRY}"
-    OUT_IMAGE: "${CI_REGISTRY_IMAGE}/${IMAGE_NAME}"
-
-deploy:ci-vectoradd-ubuntu18:
-  extends:
-    - .deploy:ci
-    - .distribution-ubuntu18
-    - .sample-vectoradd
-  dependencies:
-    - build-vectoradd-ubuntu18
-
-deploy:ci-vectoradd-ubuntu20:
-  extends:
-    - .deploy:ci
-    - .distribution-ubuntu20
-    - .sample-vectoradd
-  dependencies:
-    - build-vectoradd-ubuntu20
-
-deploy:ci-vectoradd-ubi8:
-  extends:
-    - .deploy:ci
-    - .distribution-ubuntu18
-    - .sample-vectoradd
-  dependencies:
-    - build-vectoradd-ubi8
-
-deploy:ci-nbody-ubuntu18:
-  extends:
-    - .deploy:ci
-    - .distribution-ubuntu18
-    - .sample-nbody
-  dependencies:
-    - build-nbody-ubuntu18
-
-# A release job is a deployment job that has a different output version / image
-.release:
-  extends: .deploy
-  stage: release
-  variables:
-    # We use the CI_COMMIT_REF_SLUG as the release version as this covers tags and non-tags (for staging releases)
-    VERSION: "${CI_COMMIT_REF_SLUG}"
+    - make IMAGE_NAME=${OUT_IMAGE_NAME} IMAGE_TAG=${OUT_IMAGE_TAG} -f deployments/container/Makefile push-${DIST}
 
 # Define a staging release step that pushes an image to an internal "staging" repository
 # This is triggered for all pipelines (i.e. not only tags) to test the pipeline steps
 # outside of the release process.
 .release:staging:
-  extends: .release
+  extends:
+    - .release
   variables:
     OUT_REGISTRY_USER: "${CI_REGISTRY_USER}"
     OUT_REGISTRY_TOKEN: "${CI_REGISTRY_PASSWORD}"
     OUT_REGISTRY: "${CI_REGISTRY}"
-    OUT_IMAGE: "${CI_REGISTRY_IMAGE}/staging/${IMAGE_NAME}"
+    OUT_IMAGE_NAME: "${CI_REGISTRY_IMAGE}/staging/cuda-samples"
 
+# Define an external release step that pushes an image to an external repository.
+# This includes a devlopment image off master.
 .release:external:
-  extends: .release
-  only:
-    - tags
-
-.nbody-untagged:
-  variables:
-    OUT_IMAGE_TAG: "nbody"
-
-release:staging-vectoradd-ubuntu18:
   extends:
-    - .release:staging
-    - .distribution-ubuntu18
-    - .sample-vectoradd
-  dependencies:
-    - deploy:ci-vectoradd-ubuntu18
+    - .release
+  rules:
+    - if: $CI_COMMIT_TAG
+      variables:
+        OUT_IMAGE_VERSION: "${CI_COMMIT_TAG}"
+    - if: $CI_COMMIT_BRANCH == $RELEASE_DEVEL_BRANCH
+      variables:
+        OUT_IMAGE_VERSION: "${DEVEL_RELEASE_IMAGE_VERSION}"
 
-release:staging-vectoradd-ubuntu20:
-  extends:
-    - .release:staging
-    - .distribution-ubuntu20
-    - .sample-vectoradd
-  dependencies:
-    - deploy:ci-vectoradd-ubuntu20
-
+# Define the release jobs
 release:staging-vectoradd-ubi8:
   extends:
     - .release:staging
-    - .distribution-ubi8
+    - .dist-ubi8
     - .sample-vectoradd
-  dependencies:
-    - deploy:ci-vectoradd-ubi8
+  needs:
+    - image-vectoradd-ubi8
 
-release:staging-nbody-untagged:
+release:staging-vectoradd-ubuntu18.04:
   extends:
     - .release:staging
-    - .distribution-ubuntu18
+    - .dist-ubuntu18.04
+    - .sample-vectoradd
+  needs:
+    - image-vectoradd-ubuntu18.04
+
+release:staging-vectoradd-ubuntu20.04:
+  extends:
+    - .release:staging
+    - .dist-ubuntu20.04
+    - .sample-vectoradd
+  needs:
+    - image-vectoradd-ubuntu20.04
+
+release:staging-nbody-ubuntu18.04:
+  extends:
+    - .release:staging
+    - .dist-ubuntu18.04
     - .sample-nbody
-    - .nbody-untagged
   dependencies:
-    - deploy:ci-nbody-ubuntu18
+    - image-nbody-ubuntu18.04
