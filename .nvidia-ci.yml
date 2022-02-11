@@ -157,6 +157,7 @@ scan-nbody-ubuntu18.04:
     OUT_IMAGE_NAME: "${NGC_REGISTRY_IMAGE}"
     # Disable external releases for now
     DOCKER: echo
+    REGCTL: echo
 
 .release:dockerhub:
   extends:
@@ -168,6 +169,7 @@ scan-nbody-ubuntu18.04:
     OUT_IMAGE_NAME: "${REGISTRY_IMAGE}"
     # Disable external releases for now
     DOCKER: echo
+    REGCTL: echo
 
 # Define the external release targets
 # Release to NGC
