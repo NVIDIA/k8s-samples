@@ -18,7 +18,7 @@ FROM nvidia/cuda:${CUDA_VERSION}-devel-${BASE_DIST} AS builder
 
 ARG CUDA_VERSION
 RUN dnf install -y  \
-        cuda-samples-$(echo ${CUDA_VERSION} | sed -e 's/\./-/' | sed -e 's/\.[0-9]\+//' ) \
+        curl \
     && \
     dnf clean all
 
@@ -26,9 +26,12 @@ WORKDIR /build
 
 ARG SAMPLE_NAME
 ENV SAMPLE_NAME ${SAMPLE_NAME}
-RUN cd $(find /usr/local/cuda/samples -iname "${SAMPLE_NAME}") && \
+ARG CUDA_SAMPLES_VERSION=v11.6
+RUN curl -L https://codeload.github.com/NVIDIA/cuda-samples/tar.gz/refs/tags/${CUDA_SAMPLES_VERSION} | \
+    tar -xzvf - --strip-components=1 --wildcards */${SAMPLE_NAME}/* --wildcards */Common/* && \
+    cd $(find /build/Samples -iname "${SAMPLE_NAME}") && \
     make build && \
-    cp $(find /usr/local/cuda/samples/bin/ -iname "${SAMPLE_NAME}") /build/${SAMPLE_NAME}
+    cp $(find /build/bin -iname "${SAMPLE_NAME}") /build/${SAMPLE_NAME}
 
 FROM nvidia/cuda:${CUDA_VERSION}-base-${BASE_DIST}
 ARG SAMPLE_NAME

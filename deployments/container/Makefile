@@ -86,6 +86,7 @@ $(BUILD_TARGETS): build-%:
 		--tag $(IMAGE) \
 		--build-arg BASE_DIST="$(DIST)" \
 		--build-arg CUDA_VERSION="$(CUDA_VERSION)" \
+		--build-arg CUDA_SAMPLES_VERSION="$(CUDA_SAMPLES_VERSION)" \
 		--build-arg SAMPLE_NAME=$(SAMPLE) \
 		-f $(DOCKERFILE) \
 		$(CURDIR)
