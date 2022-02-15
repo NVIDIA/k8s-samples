@@ -17,21 +17,25 @@ ARG CUDA_VERSION
 FROM nvidia/cuda:${CUDA_VERSION}-devel-${BASE_DIST} AS builder
 
 ARG CUDA_VERSION
+ARG SAMPLE_NAME
+ENV SAMPLE_NAME ${SAMPLE_NAME}
+
 ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y --no-install-recommends \
         curl \
+    && ( \
     # The nbody sample requires libGL, libGLU, and libglut
+        test "${SAMPLE_NAME}" != "nbody" || apt-get install -y --no-install-recommends \
         freeglut3-dev \
         libgl1-mesa-dev \
         libglu1-mesa-dev \
+    ) \
     && \
         rm -rf /var/lib/apt/lists/*
 
 WORKDIR /build
 
 ARG TARGETARCH
-ARG SAMPLE_NAME
-ENV SAMPLE_NAME ${SAMPLE_NAME}
 
 ARG CUDA_SAMPLES_VERSION=v11.6
 RUN curl -L https://codeload.github.com/NVIDIA/cuda-samples/tar.gz/refs/tags/${CUDA_SAMPLES_VERSION} | \
