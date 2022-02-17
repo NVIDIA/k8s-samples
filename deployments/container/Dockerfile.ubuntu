@@ -13,28 +13,38 @@
 # limitations under the License.
 
 ARG BASE_DIST
-ARG CUDA_VER
-FROM nvidia/cuda:${CUDA_VER}-devel-${BASE_DIST} AS builder
+ARG CUDA_VERSION
+FROM nvidia/cuda:${CUDA_VERSION}-devel-${BASE_DIST} AS builder
 
-ARG CUDA_VER
+ARG CUDA_VERSION
+ARG SAMPLE_NAME
+ENV SAMPLE_NAME ${SAMPLE_NAME}
+
+ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y --no-install-recommends \
-        cuda-samples-$(echo ${CUDA_VER} | sed -e 's/\./-/' | sed -e 's/\.[0-9]\+//' ) \
+        curl \
+    && ( \
     # The nbody sample requires libGL, libGLU, and libglut
+        test "${SAMPLE_NAME}" != "nbody" || apt-get install -y --no-install-recommends \
         freeglut3-dev \
         libgl1-mesa-dev \
         libglu1-mesa-dev \
+    ) \
     && \
         rm -rf /var/lib/apt/lists/*
 
 WORKDIR /build
 
-ARG SAMPLE_NAME
-ENV SAMPLE_NAME ${SAMPLE_NAME}
-RUN cd $(find /usr/local/cuda/samples -iname "${SAMPLE_NAME}") && \
-    make build && \
-    cp $(find /usr/local/cuda/samples/bin/x86_64/linux/release/ -iname "${SAMPLE_NAME}") /build/${SAMPLE_NAME}
+ARG TARGETARCH
 
-FROM nvidia/cuda:${CUDA_VER}-base-${BASE_DIST}
+ARG CUDA_SAMPLES_VERSION=v11.6
+RUN curl -L https://codeload.github.com/NVIDIA/cuda-samples/tar.gz/refs/tags/${CUDA_SAMPLES_VERSION} | \
+    tar -xzvf - --strip-components=1 --wildcards */${SAMPLE_NAME}/* --wildcards */Common/* && \
+    cd $(find /build/Samples -iname "${SAMPLE_NAME}") && \
+    make build && \
+    cp $(find /build/bin -iname "${SAMPLE_NAME}") /build/${SAMPLE_NAME}
+
+FROM nvidia/cuda:${CUDA_VERSION}-base-${BASE_DIST}
 ARG SAMPLE_NAME
 LABEL io.k8s.display-name="NVIDIA CUDA ${SAMPLE_NAME} sample"
 LABEL name="NVIDIA CUDA ${SAMPLE_NAME} sample"
