@@ -102,8 +102,7 @@ image-nbody-ubuntu18.04:
       - $SKIP_SCANS && $SKIP_SCANS == "yes"
   before_script:
     - docker login -u "${CI_REGISTRY_USER}" -p "${CI_REGISTRY_PASSWORD}" "${CI_REGISTRY}"
-    # TODO: We should specify the architecture here and scan all architectures
-    - docker pull "${IMAGE}"
+    - docker pull --platform="${PLATFORM}" "${IMAGE}"
     - docker save "${IMAGE}" -o "${IMAGE_ARCHIVE}"
     - AuthHeader=$(echo -n $SSA_CLIENT_ID:$SSA_CLIENT_SECRET | base64 -w0)
     - >
@@ -122,29 +121,81 @@ image-nbody-ubuntu18.04:
       - policy_evaluation.json
 
 # Define the scan targets
-scan-vectoradd-ubuntu18.04:
+scan-vectoradd-ubuntu18.04-amd64:
   extends:
     - .scan
-    - .dist-ubuntu18.04
     - .sample-vectoradd
+    - .dist-ubuntu18.04
+    - .platform-amd64
+  needs:
+    - image-vectoradd-ubuntu18.04
 
-scan-vectoradd-ubuntu20.04:
+scan-vectoradd-ubuntu18.04-arm64:
   extends:
     - .scan
+    - .sample-vectoradd
+    - .dist-ubuntu18.04
+    - .platform-arm64
+  needs:
+    - image-vectoradd-ubuntu18.04
+    - scan-vectoradd-ubuntu18.04-amd64
+
+scan-vectoradd-ubuntu20.04-amd64:
+  extends:
+    - .scan
+    - .sample-vectoradd
     - .dist-ubuntu20.04
-    - .sample-vectoradd
+    - .platform-amd64
+  needs:
+    - image-vectoradd-ubuntu20.04
 
-scan-vectoradd-ubi8:
+scan-vectoradd-ubuntu20.04-arm64:
   extends:
     - .scan
+    - .sample-vectoradd
+    - .dist-ubuntu20.04
+    - .platform-arm64
+  needs:
+    - image-vectoradd-ubuntu20.04
+    - scan-vectoradd-ubuntu20.04-amd64
+
+scan-vectoradd-ubi8-amd64:
+  extends:
+    - .scan
+    - .sample-vectoradd
     - .dist-ubi8
-    - .sample-vectoradd
+    - .platform-amd64
+  needs:
+    - image-vectoradd-ubi8
 
-scan-nbody-ubuntu18.04:
+scan-vectoradd-ubi8-arm64:
   extends:
     - .scan
-    - .dist-ubuntu18.04
+    - .sample-vectoradd
+    - .dist-ubi8
+    - .platform-arm64
+  needs:
+    - image-vectoradd-ubi8
+    - scan-vectoradd-ubi8-amd64
+
+scan-nbody-ubuntu18.04-amd64:
+  extends:
+    - .scan
     - .sample-nbody
+    - .dist-ubuntu18.04
+    - .platform-amd64
+  needs:
+    - image-nbody-ubuntu18.04
+
+scan-nbody-ubuntu18.04-arm64:
+  extends:
+    - .scan
+    - .sample-nbody
+    - .dist-ubuntu18.04
+    - .platform-arm64
+  needs:
+    - image-nbody-ubuntu18.04
+    - scan-nbody-ubuntu18.04-amd64
 
 # Define external release helpers
 .release:ngc:
