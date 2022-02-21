@@ -181,5 +181,5 @@ release:staging-nbody-ubuntu18.04:
     - .release:staging
     - .dist-ubuntu18.04
     - .sample-nbody
-  dependencies:
+  needs:
     - image-nbody-ubuntu18.04
