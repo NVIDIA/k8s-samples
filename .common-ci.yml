@@ -51,6 +51,15 @@ stages:
   variables:
     DIST: ubi8
 
+# Define the platform targets
+.platform-amd64:
+  variables:
+    PLATFORM: linux/amd64
+
+.platform-arm64:
+  variables:
+    PLATFORM: linux/arm64
+
 # Define the sample targets
 .sample-vectoradd:
   variables:
