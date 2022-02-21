@@ -25,7 +25,7 @@ $(PUSH_TARGETS): push-%:
 push-short:
 	$(REGCTL) \
 	        image copy \
-	        $(IMAGE) $(OUT_IMAGE_NAME):$(OUT_IMAGE_VERSION)
+	        $(IMAGE) $(OUT_IMAGE_NAME):${LOWER_CASE_SAMPLE}-$(OUT_IMAGE_VERSION)
 
 push-sample:
 	$(REGCTL) \

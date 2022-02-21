@@ -104,10 +104,8 @@ stages:
     # Define the source image for the release
     IMAGE_NAME: "${CI_REGISTRY_IMAGE}/cuda-samples"
     VERSION: "${CI_COMMIT_SHORT_SHA}"
-    IMAGE_TAG: "${LOWER_CASE_SAMPLE}-${CI_COMMIT_SHORT_SHA}-${DIST}"
     # OUT_IMAGE_VERSION is overridden for external releases
     OUT_IMAGE_VERSION: "${CI_COMMIT_SHORT_SHA}"
-    OUT_IMAGE_TAG: "${LOWER_CASE_SAMPLE}-${OUT_IMAGE_VERSION}-${DIST}"
   before_script:
     - !reference [.regctl-setup, before_script]
 

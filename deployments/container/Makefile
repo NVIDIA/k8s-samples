@@ -40,8 +40,8 @@ IMAGE_TAG ?= $(IMAGE_VERSION)-$(DIST)
 IMAGE = $(IMAGE_NAME):$(IMAGE_TAG)
 
 OUT_IMAGE_NAME ?= $(IMAGE_NAME)
-OUT_IMAGE_VERSION ?= $(IMAGE_VERSION)
-OUT_IMAGE_TAG ?= $(OUT_IMAGE_VERSION)-$(DIST)
+OUT_IMAGE_VERSION ?= $(VERSION)
+OUT_IMAGE_TAG ?= $(LOWER_CASE_SAMPLE)-$(OUT_IMAGE_VERSION)-$(DIST)
 OUT_IMAGE = $(OUT_IMAGE_NAME):$(OUT_IMAGE_TAG)
 
 DEFAULT_DISTRIBUTION := ubuntu18.04
@@ -71,7 +71,11 @@ ifeq ($(strip $(VERSION)),$(DEVEL_RELEASE_IMAGE_VERSION))
 PUSH_MULTIPLE_TAGS = false
 endif
 ifeq ($(PUSH_MULTIPLE_TAGS),true)
-push-$(DEFAULT_DISTRIBUTION): push-short push-sample
+push-$(DEFAULT_DISTRIBUTION): push-short
+# For the nbody sample we also push a version that is ONLY tagged with the sample name.
+ifeq ($(SAMPLE),nbody)
+push-$(DEFAULT_DISTRIBUTION): push-sample
+endif
 endif
 
 build-%: DIST = $(*)
