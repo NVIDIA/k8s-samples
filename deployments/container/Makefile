@@ -66,7 +66,11 @@ push-sample: DIST = $(DEFAULT_DISTRIBUTION)
 # For the default push target we also push a short tag equal to the version.
 # We skip this for the development release
 DEVEL_RELEASE_IMAGE_VERSION ?= devel
-ifneq ($(strip $(VERSION)),$(DEVEL_RELEASE_IMAGE_VERSION))
+PUSH_MULTIPLE_TAGS ?= true
+ifeq ($(strip $(VERSION)),$(DEVEL_RELEASE_IMAGE_VERSION))
+PUSH_MULTIPLE_TAGS = false
+endif
+ifeq ($(PUSH_MULTIPLE_TAGS),true)
 push-$(DEFAULT_DISTRIBUTION): push-short push-sample
 endif
 
