@@ -96,7 +96,7 @@ image-nbody-ubuntu18.04:
   stage: scan
   image: "${PULSE_IMAGE}"
   variables:
-    IMAGE: "${CI_REGISTRY_IMAGE}:${LOWER_CASE_SAMPLE}-${CI_COMMIT_SHORT_SHA}-${DIST}"
+    IMAGE: "${CI_REGISTRY_IMAGE}/cuda-samples:${LOWER_CASE_SAMPLE}-${CI_COMMIT_SHORT_SHA}-${DIST}"
     IMAGE_ARCHIVE: "cuda-samples.tar"
   except:
     variables:
