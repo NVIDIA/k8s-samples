@@ -44,7 +44,7 @@ OUT_IMAGE_VERSION ?= $(VERSION)
 OUT_IMAGE_TAG ?= $(LOWER_CASE_SAMPLE)-$(OUT_IMAGE_VERSION)-$(DIST)
 OUT_IMAGE = $(OUT_IMAGE_NAME):$(OUT_IMAGE_TAG)
 
-DEFAULT_DISTRIBUTION := ubuntu18.04
+DEFAULT_PUSH_TARGET := ubuntu18.04
 DISTRIBUTIONS := ubuntu18.04 ubuntu20.04 ubi8
 
 BUILD_TARGETS := $(patsubst %,build-%, $(DISTRIBUTIONS))
@@ -60,21 +60,22 @@ include $(CURDIR)/deployments/container/multi-arch.mk
 endif
 
 push-%: DIST = $(*)
-push-short: DIST = $(DEFAULT_DISTRIBUTION)
-push-sample: DIST = $(DEFAULT_DISTRIBUTION)
+push-short: DIST = $(DEFAULT_PUSH_TARGET)
+push-sample: DIST = $(DEFAULT_PUSH_TARGET)
 
 # For the default push target we also push a short tag equal to the version.
 # We skip this for the development release
 DEVEL_RELEASE_IMAGE_VERSION ?= devel
 PUSH_MULTIPLE_TAGS ?= true
-ifeq ($(strip $(VERSION)),$(DEVEL_RELEASE_IMAGE_VERSION))
+PUSH_SAMPLE_ONLY_TAG ?= false
+ifeq ($(strip $(OUT_IMAGE_VERSION)),$(DEVEL_RELEASE_IMAGE_VERSION))
 PUSH_MULTIPLE_TAGS = false
 endif
 ifeq ($(PUSH_MULTIPLE_TAGS),true)
-push-$(DEFAULT_DISTRIBUTION): push-short
-# For the nbody sample we also push a version that is ONLY tagged with the sample name.
-ifeq ($(SAMPLE),nbody)
-push-$(DEFAULT_DISTRIBUTION): push-sample
+push-$(DEFAULT_PUSH_TARGET): push-short
+# If required we retag and push the image tagged only with the sample name
+ifeq ($(PUSH_SAMPLE_ONLY_TAG),true)
+push-$(DEFAULT_PUSH_TARGET): push-sample
 endif
 endif
 
