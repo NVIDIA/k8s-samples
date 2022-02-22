@@ -15,13 +15,13 @@
 DOCKER_BUILD_PLATFORM_OPTIONS = --platform=linux/amd64
 
 $(PUSH_TARGETS): push-%:
-	$(DOCKER) push "$(IMAGE)"
+	$(DOCKER) tag "$(IMAGE)" "$(OUT_IMAGE)"
+	$(DOCKER) push "$(OUT_IMAGE)"
 
 push-short:
 	$(DOCKER) tag $(IMAGE) $(OUT_IMAGE_NAME):${LOWER_CASE_SAMPLE}-$(OUT_IMAGE_VERSION)
 	$(DOCKER) push $(OUT_IMAGE_NAME):${LOWER_CASE_SAMPLE}-$(OUT_IMAGE_VERSION)
 
 push-sample:
-	@echo "Push sample"
 	$(DOCKER) tag $(IMAGE) $(OUT_IMAGE_NAME):$(LOWER_CASE_SAMPLE)
 	$(DOCKER) push $(OUT_IMAGE_NAME):$(LOWER_CASE_SAMPLE)

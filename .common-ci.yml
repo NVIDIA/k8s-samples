@@ -65,11 +65,13 @@ stages:
   variables:
     SAMPLE: vectorAdd
     LOWER_CASE_SAMPLE: vectoradd
+    PUSH_SAMPLE_ONLY_TAG: "false"
 
 .sample-nbody:
   variables:
     SAMPLE: nbody
     LOWER_CASE_SAMPLE: nbody
+    PUSH_SAMPLE_ONLY_TAG: "true"
 
 # Make buildx available as a docker CLI plugin
 .buildx-setup:
