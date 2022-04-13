@@ -208,15 +208,6 @@ scan-nbody-ubuntu18.04-arm64:
     OUT_REGISTRY: "${NGC_REGISTRY}"
     OUT_IMAGE_NAME: "${NGC_REGISTRY_IMAGE}"
 
-.release:dockerhub:
-  extends:
-    - .release:external
-  variables:
-    OUT_REGISTRY_USER: "${REGISTRY_USER}"
-    OUT_REGISTRY_TOKEN: "${REGISTRY_TOKEN}"
-    OUT_REGISTRY: "${DOCKERHUB_REGISTRY}"
-    OUT_IMAGE_NAME: "${REGISTRY_IMAGE}"
-
 # Define the external release targets
 # Release to NGC
 release:ngc-vectoradd-ubuntu18.04:
@@ -240,30 +231,5 @@ release:ngc-vectoradd-ubi8:
 release:ngc-nbody-ubuntu18.04:
   extends:
     - .release:ngc
-    - .dist-ubuntu18.04
-    - .sample-nbody
-
-# Release to Dockerhub
-release:dockerhub-vectoradd-ubuntu18.04:
-  extends:
-    - .release:dockerhub
-    - .dist-ubuntu18.04
-    - .sample-vectoradd
-
-release:dockerhub-vectoradd-ubuntu20.04:
-  extends:
-    - .release:dockerhub
-    - .dist-ubuntu20.04
-    - .sample-vectoradd
-
-release:dockerhub-vectoradd-ubi8:
-  extends:
-    - .release:dockerhub
-    - .dist-ubi8
-    - .sample-vectoradd
-
-release:dockerhub-nbody-ubuntu18.04:
-  extends:
-    - .release:dockerhub
     - .dist-ubuntu18.04
     - .sample-nbody
