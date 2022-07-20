@@ -42,6 +42,12 @@ image-vectoradd-ubuntu20.04:
     - .dist-ubuntu20.04
     - .sample-vectoradd
 
+image-device-query-ubuntu20.04:
+  extends:
+    - .image-build
+    - .dist-ubuntu20.04
+    - .sample-device-query
+
 image-vectoradd-ubi8:
   extends:
     - .image-build

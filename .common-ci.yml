@@ -76,6 +76,12 @@ stages:
     LOWER_CASE_SAMPLE: nbody
     PUSH_SAMPLE_ONLY_TAG: "true"
 
+.sample-device-query:
+  variables:
+    SAMPLE: deviceQuery
+    LOWER_CASE_SAMPLE: devicequery
+    PUSH_SAMPLE_ONLY_TAG: "true"
+
 # Make buildx available as a docker CLI plugin
 .buildx-setup:
   before_script:
@@ -178,6 +184,14 @@ release:staging-vectoradd-ubuntu20.04:
     - .sample-vectoradd
   needs:
     - image-vectoradd-ubuntu20.04
+
+release:staging-device-query-ubuntu20.04:
+  extends:
+    - .release:staging
+    - .dist-ubuntu20.04
+    - .sample-device-query
+  needs:
+    - image-device-query-ubuntu20.04
 
 release:staging-nbody-ubuntu18.04:
   extends:
