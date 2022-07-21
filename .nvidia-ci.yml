@@ -84,6 +84,12 @@ image-vectoradd-ubi8:
     - .dist-ubi8
     - .sample-vectoradd
 
+image-device-query-ubuntu20.04:
+  extends:
+    - .image-pull
+    - .dist-ubuntu20.04
+    - .sample-device-query
+
 image-nbody-ubuntu18.04:
   extends:
     - .image-pull
@@ -160,6 +166,25 @@ scan-vectoradd-ubuntu20.04-arm64:
     - image-vectoradd-ubuntu20.04
     - scan-vectoradd-ubuntu20.04-amd64
 
+scan-device-query-ubuntu20.04-amd64:
+  extends:
+    - .scan
+    - .sample-device-query
+    - .dist-ubuntu20.04
+    - .platform-amd64
+  needs:
+    - image-device-query-ubuntu20.04
+
+scan-device-query-ubuntu20.04-arm64:
+  extends:
+    - .scan
+    - .sample-device-query
+    - .dist-ubuntu20.04
+    - .platform-arm64
+  needs:
+    - image-device-query-ubuntu20.04
+    - scan-device-query-ubuntu20.04-amd64
+
 scan-vectoradd-ubi8-amd64:
   extends:
     - .scan
@@ -221,6 +246,12 @@ release:ngc-vectoradd-ubuntu20.04:
     - .release:ngc
     - .dist-ubuntu20.04
     - .sample-vectoradd
+
+release:ngc-device-query-ubuntu20.04:
+  extends:
+    - .release:ngc
+    - .dist-ubuntu20.04
+    - .sample-device-query
 
 release:ngc-vectoradd-ubi8:
   extends:
