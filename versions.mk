@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-CUDA_VERSION ?= 11.6.0
+# Specify the CUDA base image version
+CUDA_VERSION ?= 11.7.1
 VERSION ?= cuda${CUDA_VERSION:cuda%=%}
 
 # Specify the tag for the https://github.com/NVIDIA/cuda-samples repository.
