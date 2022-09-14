@@ -71,7 +71,8 @@ RUN if [ -n "${CVE_UPDATES}" ]; then \
         rm -rf /var/lib/apt/lists/*; \
     fi
 
-COPY --from=builder /build/${SAMPLE_NAME} /tmp/${SAMPLE_NAME}
+RUN mkdir -p /cuda-samples
+COPY --from=builder /build/${SAMPLE_NAME} /cuda-samples/${SAMPLE_NAME}
 
-RUN ln -s /tmp/${SAMPLE_NAME} /tmp/sample
-ENTRYPOINT ["/tmp/sample"]
+RUN ln -s /cuda-samples/${SAMPLE_NAME} /cuda-samples/sample
+ENTRYPOINT ["/cuda-samples/sample"]
