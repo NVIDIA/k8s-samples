@@ -90,8 +90,14 @@ stages:
     -  mkdir -p ~/.docker/cli-plugins
     -  curl -sSLo ~/.docker/cli-plugins/docker-buildx "https://github.com/docker/buildx/releases/download/${BUILDX_VERSION}/buildx-${BUILDX_VERSION}.linux-amd64"
     -  chmod a+x ~/.docker/cli-plugins/docker-buildx
+    - |
+      cat <<EOF > buildx-cfg.toml
+        [worker.oci]
+          max-parallelism = 1
+      EOF
+    - cat buildx-cfg.toml
 
-    -  docker buildx create --use --platform=linux/amd64,linux/arm64
+    -  docker buildx create --use --platform=linux/amd64,linux/arm64 --config=buildx-cfg.toml
 
     -  '[[ -n "${SKIP_QEMU_SETUP}" ]] || docker run --rm --privileged multiarch/qemu-user-static --reset -p yes'
 
