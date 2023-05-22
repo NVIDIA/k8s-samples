@@ -18,4 +18,4 @@ VERSION ?= cuda${CUDA_VERSION:cuda%=%}
 
 # Specify the tag for the https://github.com/NVIDIA/cuda-samples repository.
 # This need not match the CUDA_VERSION above.
-CUDA_SAMPLES_VERSION := v11.6
+CUDA_SAMPLES_VERSION := v12.1
