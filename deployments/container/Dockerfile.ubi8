@@ -43,6 +43,9 @@ LABEL release="N/A"
 LABEL summary="NVIDIA container to validate GPU support"
 LABEL description="See summary"
 
+# Remove CUDA libs(compat etc) in favor of libs installed by the NVIDIA driver
+RUN dnf remove -y cuda-*
+
 COPY ./LICENSE ./licenses/LICENSE
 
 # Install / upgrade packages here that are required to resolve CVEs

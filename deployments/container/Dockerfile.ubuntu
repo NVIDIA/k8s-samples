@@ -54,6 +54,9 @@ LABEL release="N/A"
 LABEL summary="NVIDIA container to validate GPU support"
 LABEL description="See summary"
 
+# Remove CUDA libs(compat etc) in favor of libs installed by the NVIDIA driver
+RUN apt-get --purge -y autoremove cuda-*
+
 # The nbody sample requires libGL, libGLU, and libglut
 RUN test "${SAMPLE_NAME}" = "nbody" && apt-get update && apt-get install -y --no-install-recommends \
         freeglut3 \
