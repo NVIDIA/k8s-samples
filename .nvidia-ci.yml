@@ -33,14 +33,14 @@ variables:
   # On the multi-arch builder we don't need the qemu setup.
   SKIP_QEMU_SETUP: "1"
   # Define the public staging registry
-  STAGING_REGISTRY: registry.gitlab.com/nvidia/container-images/samples/staging
+  STAGING_REGISTRY: ghcr.io/nvidia
   STAGING_VERSION: ${CI_COMMIT_SHORT_SHA}
 
 .image-pull:
   stage: image-build
   variables:
     IN_REGISTRY: "${STAGING_REGISTRY}"
-    IN_IMAGE_NAME: cuda-samples
+    IN_IMAGE_NAME: k8s-samples
     IN_VERSION: "${LOWER_CASE_SAMPLE}-${STAGING_VERSION}"
     OUT_REGISTRY_USER: "${CI_REGISTRY_USER}"
     OUT_REGISTRY_TOKEN: "${CI_REGISTRY_PASSWORD}"
