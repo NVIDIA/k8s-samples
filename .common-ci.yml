@@ -39,20 +39,13 @@ stages:
   - release
 
 # Define the distribution targets
-.dist-ubuntu18.04:
+.dist-ubuntu22.04:
   variables:
-    DIST: ubuntu18.04
-    CVE_UPDATES: "libsasl2-2 libsasl2-modules-db"
-
-.dist-ubuntu20.04:
-  variables:
-    DIST: ubuntu20.04
-    CVE_UPDATES: "libsasl2-2 libsasl2-modules-db"
+    DIST: ubuntu22.04
 
 .dist-ubi8:
   variables:
     DIST: ubi8
-    CVE_UPDATES: "cyrus-sasl-lib"
 
 # Define the platform targets
 .platform-amd64:
@@ -169,34 +162,19 @@ release:staging-vectoradd-ubi8:
   needs:
     - image-vectoradd-ubi8
 
-release:staging-vectoradd-ubuntu18.04:
+release:staging-vectoradd-ubuntu22.04:
   extends:
     - .release:staging
-    - .dist-ubuntu18.04
+    - .dist-ubuntu22.04
     - .sample-vectoradd
   needs:
-    - image-vectoradd-ubuntu18.04
+    - image-vectoradd-ubuntu22.04
 
-release:staging-vectoradd-ubuntu20.04:
+release:staging-device-query-ubuntu22.04:
   extends:
     - .release:staging
-    - .dist-ubuntu20.04
-    - .sample-vectoradd
-  needs:
-    - image-vectoradd-ubuntu20.04
-
-release:staging-device-query-ubuntu20.04:
-  extends:
-    - .release:staging
-    - .dist-ubuntu20.04
+    - .dist-ubuntu22.04
     - .sample-device-query
   needs:
-    - image-device-query-ubuntu20.04
+    - image-device-query-ubuntu22.04
 
-release:staging-nbody-ubuntu18.04:
-  extends:
-    - .release:staging
-    - .dist-ubuntu18.04
-    - .sample-nbody
-  needs:
-    - image-nbody-ubuntu18.04
