@@ -93,8 +93,6 @@ $(BUILD_TARGETS): build-%:
 		$(DOCKER_BUILD_OPTIONS) \
 		$(DOCKER_BUILD_PLATFORM_OPTIONS) \
 		--tag $(IMAGE) \
-		--build-arg BASE_DIST="$(DIST)" \
-		--build-arg CUDA_VERSION="$(CUDA_VERSION)" \
 		--build-arg CUDA_SAMPLES_VERSION="$(CUDA_SAMPLES_VERSION)" \
 		--build-arg SAMPLE_NAME=$(SAMPLE) \
 		--build-arg CVE_UPDATES="$(CVE_UPDATES)" \
