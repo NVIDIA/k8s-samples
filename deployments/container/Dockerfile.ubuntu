@@ -12,11 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-ARG BASE_DIST
-ARG CUDA_VERSION
-FROM nvidia/cuda:${CUDA_VERSION}-devel-${BASE_DIST} AS builder
+FROM nvidia/cuda:11.7.1-devel-ubuntu20.04 AS builder
 
-ARG CUDA_VERSION
 ARG SAMPLE_NAME
 ENV SAMPLE_NAME ${SAMPLE_NAME}
 
@@ -44,7 +41,7 @@ RUN curl -L https://codeload.github.com/NVIDIA/cuda-samples/tar.gz/refs/tags/${C
     make build && \
     cp $(find /build/bin -iname "${SAMPLE_NAME}") /build/${SAMPLE_NAME}
 
-FROM nvidia/cuda:${CUDA_VERSION}-base-${BASE_DIST}
+FROM nvidia/cuda:11.7.1-base-ubuntu20.04
 ARG SAMPLE_NAME
 LABEL io.k8s.display-name="NVIDIA CUDA ${SAMPLE_NAME} sample"
 LABEL name="NVIDIA CUDA ${SAMPLE_NAME} sample"
