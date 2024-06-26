@@ -34,7 +34,7 @@ jobs:
     strategy:
       matrix:
         dist:
-        - ubuntu20.04
+        - ubuntu22.04
         - ubi8
         sample:
         - vectorAdd
