@@ -90,6 +90,7 @@ build-ubi8: DOCKERFILE_SUFFIX = ubi8
 $(BUILD_TARGETS): build-%:
 	DOCKER_BUILDKIT=1 \
 		$(DOCKER) $(BUILDX) build --pull \
+		--provenance=false --sbom=false \
 		$(DOCKER_BUILD_OPTIONS) \
 		$(DOCKER_BUILD_PLATFORM_OPTIONS) \
 		--tag $(IMAGE) \
