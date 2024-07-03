@@ -84,6 +84,12 @@ image-device-query-ubuntu22.04:
     - .dist-ubuntu22.04
     - .sample-device-query
 
+image-nbody-ubuntu22.04:
+  extends:
+    - .image-pull
+    - .dist-ubuntu22.04
+    - .sample-nbody
+
 # The .scan step forms the base of the image scan operation performed before releasing
 # images.
 .scan:
@@ -173,6 +179,25 @@ scan-vectoradd-ubi8-arm64:
     - image-vectoradd-ubi8
     - scan-vectoradd-ubi8-amd64
 
+scan-nbody-ubuntu22.04-amd64:
+  extends:
+    - .scan
+    - .sample-nbody
+    - .dist-ubuntu22.04
+    - .platform-amd64
+  needs:
+    - image-nbody-ubuntu22.04
+
+scan-nbody-ubuntu22.04-arm64:
+  extends:
+    - .scan
+    - .sample-nbody
+    - .dist-ubuntu22.04
+    - .platform-arm64
+  needs:
+    - image-nbody-ubuntu22.04
+    - scan-nbody-ubuntu22.04-amd64
+
 # Define external release helpers
 .release:ngc:
   extends:
@@ -202,3 +227,9 @@ release:ngc-vectoradd-ubi8:
     - .release:ngc
     - .dist-ubi8
     - .sample-vectoradd
+
+release:ngc-nbody-ubuntu22.04:
+  extends:
+    - .release:ngc
+    - .dist-ubuntu22.04
+    - .sample-nbody
