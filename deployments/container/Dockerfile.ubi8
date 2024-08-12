@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM nvidia/cuda:12.5.1-devel-ubi8 AS builder
+FROM nvidia/cuda:12.6.0-devel-ubi8 AS builder
 
 ARG CUDA_VERSION
 RUN dnf install -y  \
@@ -31,7 +31,7 @@ RUN curl -L https://codeload.github.com/NVIDIA/cuda-samples/tar.gz/refs/tags/${C
     make build && \
     cp $(find /build/bin -iname "${SAMPLE_NAME}") /build/${SAMPLE_NAME}
 
-FROM nvidia/cuda:12.5.1-base-ubi8
+FROM nvidia/cuda:12.6.0-base-ubi8
 ARG SAMPLE_NAME
 LABEL io.k8s.display-name="NVIDIA CUDA ${SAMPLE_NAME} sample"
 LABEL name="NVIDIA CUDA ${SAMPLE_NAME} sample"
