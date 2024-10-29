@@ -12,13 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM nvcr.io/nvidia/cuda:12.6.2-devel-ubuntu22.04 AS builder
+FROM nvcr.io/nvidia/cuda:12.6.2-base-ubuntu22.04 AS builder
 
 ARG SAMPLE_NAME
-ENV SAMPLE_NAME ${SAMPLE_NAME}
+ENV SAMPLE_NAME=${SAMPLE_NAME}
 
 ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y --no-install-recommends \
+        cuda-nvcc-12-6 \
+        build-essential \
+        g++ \
         curl \
     && \
         rm -rf /var/lib/apt/lists/*
