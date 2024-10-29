@@ -43,13 +43,6 @@ LABEL description="See summary"
 
 COPY ./LICENSE ./licenses/LICENSE
 
-# Install / upgrade packages here that are required to resolve CVEs
-ARG CVE_UPDATES
-RUN if [ -n "${CVE_UPDATES}" ]; then \
-        yum update -y ${CVE_UPDATES} && \
-        rm -rf /var/cache/yum/*; \
-    fi
-
 RUN mkdir -p /cuda-samples
 COPY --from=builder /build/${SAMPLE_NAME} /cuda-samples/${SAMPLE_NAME}
 

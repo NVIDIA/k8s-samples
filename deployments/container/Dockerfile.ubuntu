@@ -61,13 +61,6 @@ RUN test "${SAMPLE_NAME}" = "nbody" && apt-get update && apt-get install -y --no
 
 COPY ./LICENSE ./licenses/LICENSE
 
-# Install / upgrade packages here that are required to resolve CVEs
-ARG CVE_UPDATES
-RUN if [ -n "${CVE_UPDATES}" ]; then \
-        apt-get update && apt-get upgrade -y ${CVE_UPDATES} && \
-        rm -rf /var/lib/apt/lists/*; \
-    fi
-
 RUN mkdir -p /cuda-samples
 COPY --from=builder /build/${SAMPLE_NAME} /cuda-samples/${SAMPLE_NAME}
 
