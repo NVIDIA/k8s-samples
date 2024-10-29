@@ -72,10 +72,10 @@ image-vectoradd-ubuntu22.04:
     - .dist-ubuntu22.04
     - .sample-vectoradd
 
-image-vectoradd-ubi8:
+image-vectoradd-ubi9:
   extends:
     - .image-pull
-    - .dist-ubi8
+    - .dist-ubi9
     - .sample-vectoradd
 
 image-device-query-ubuntu22.04:
@@ -160,24 +160,24 @@ scan-device-query-ubuntu22.04-arm64:
     - image-device-query-ubuntu22.04
     - scan-device-query-ubuntu22.04-amd64
 
-scan-vectoradd-ubi8-amd64:
+scan-vectoradd-ubi9-amd64:
   extends:
     - .scan
     - .sample-vectoradd
-    - .dist-ubi8
+    - .dist-ubi9
     - .platform-amd64
   needs:
-    - image-vectoradd-ubi8
+    - image-vectoradd-ubi9
 
-scan-vectoradd-ubi8-arm64:
+scan-vectoradd-ubi9-arm64:
   extends:
     - .scan
     - .sample-vectoradd
-    - .dist-ubi8
+    - .dist-ubi9
     - .platform-arm64
   needs:
-    - image-vectoradd-ubi8
-    - scan-vectoradd-ubi8-amd64
+    - image-vectoradd-ubi9
+    - scan-vectoradd-ubi9-amd64
 
 scan-nbody-ubuntu22.04-amd64:
   extends:
@@ -222,10 +222,10 @@ release:ngc-device-query-ubuntu22.04:
     - .dist-ubuntu22.04
     - .sample-device-query
 
-release:ngc-vectoradd-ubi8:
+release:ngc-vectoradd-ubi9:
   extends:
     - .release:ngc
-    - .dist-ubi8
+    - .dist-ubi9
     - .sample-vectoradd
 
 release:ngc-nbody-ubuntu22.04:

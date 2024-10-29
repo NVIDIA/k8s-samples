@@ -43,9 +43,9 @@ stages:
   variables:
     DIST: ubuntu22.04
 
-.dist-ubi8:
+.dist-ubi9:
   variables:
-    DIST: ubi8
+    DIST: ubi9
 
 # Define the platform targets
 .platform-amd64:
@@ -154,13 +154,13 @@ stages:
         OUT_IMAGE_VERSION: "${DEVEL_RELEASE_IMAGE_VERSION}"
 
 # Define the release jobs
-release:staging-vectoradd-ubi8:
+release:staging-vectoradd-ubi9:
   extends:
     - .release:staging
-    - .dist-ubi8
+    - .dist-ubi9
     - .sample-vectoradd
   needs:
-    - image-vectoradd-ubi8
+    - image-vectoradd-ubi9
 
 release:staging-vectoradd-ubuntu22.04:
   extends:

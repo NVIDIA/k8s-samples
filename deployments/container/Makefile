@@ -45,7 +45,7 @@ OUT_IMAGE_TAG ?= $(LOWER_CASE_SAMPLE)-$(OUT_IMAGE_VERSION)-$(DIST)
 OUT_IMAGE = $(OUT_IMAGE_NAME):$(OUT_IMAGE_TAG)
 
 DEFAULT_PUSH_TARGET := ubuntu22.04
-DISTRIBUTIONS := ubuntu22.04 ubi8
+DISTRIBUTIONS := ubuntu22.04 ubi9
 
 BUILD_TARGETS := $(patsubst %,build-%, $(DISTRIBUTIONS))
 PUSH_TARGETS := $(patsubst %,push-%, $(DISTRIBUTIONS))
@@ -84,7 +84,7 @@ build-%: DOCKERFILE = $(CURDIR)/deployments/container/Dockerfile.$(DOCKERFILE_SU
 
 build-ubuntu%: DOCKERFILE_SUFFIX = ubuntu
 
-build-ubi8: DOCKERFILE_SUFFIX = ubi8
+build-ubi9: DOCKERFILE_SUFFIX = ubi9
 
 # Use a generic build target to build the relevant images
 $(BUILD_TARGETS): build-%:
