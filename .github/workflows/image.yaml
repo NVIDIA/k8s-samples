@@ -35,15 +35,15 @@ jobs:
       matrix:
         dist:
         - ubuntu22.04
-        - ubi8
+        - ubi9
         sample:
         - vectorAdd
         - nbody
         - deviceQuery
         exclude:
-        - dist: ubi8
+        - dist: ubi9
           sample: deviceQuery
-        - dist: ubi8
+        - dist: ubi9
           sample: nbody
 
     steps:

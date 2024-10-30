@@ -12,21 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM nvidia/cuda:12.6.2-devel-ubuntu22.04 AS builder
+FROM nvcr.io/nvidia/cuda:12.6.2-base-ubuntu22.04 AS builder
 
 ARG SAMPLE_NAME
 ENV SAMPLE_NAME ${SAMPLE_NAME}
 
 ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y --no-install-recommends \
+        cuda-nvcc-12-6 \
         curl \
-    && ( \
-    # The nbody sample requires libGL, libGLU, and libglut
-        test "${SAMPLE_NAME}" != "nbody" || apt-get install -y --no-install-recommends \
-        freeglut3-dev \
-        libgl1-mesa-dev \
-        libglu1-mesa-dev \
-    ) \
+        g++ freeglut3-dev build-essential libx11-dev \
+        libxmu-dev libxi-dev libglu1-mesa-dev libfreeimage-dev libglfw3-dev \
     && \
         rm -rf /var/lib/apt/lists/*
 
@@ -41,7 +37,7 @@ RUN curl -L https://codeload.github.com/NVIDIA/cuda-samples/tar.gz/refs/tags/${C
     make build && \
     cp $(find /build/bin -iname "${SAMPLE_NAME}") /build/${SAMPLE_NAME}
 
-FROM nvidia/cuda:12.6.2-base-ubuntu22.04
+FROM nvcr.io/nvidia/cuda:12.6.2-base-ubuntu22.04
 ARG SAMPLE_NAME
 LABEL io.k8s.display-name="NVIDIA CUDA ${SAMPLE_NAME} sample"
 LABEL name="NVIDIA CUDA ${SAMPLE_NAME} sample"
@@ -60,13 +56,6 @@ RUN test "${SAMPLE_NAME}" = "nbody" && apt-get update && apt-get install -y --no
         rm -rf /var/lib/apt/lists/* || :
 
 COPY ./LICENSE ./licenses/LICENSE
-
-# Install / upgrade packages here that are required to resolve CVEs
-ARG CVE_UPDATES
-RUN if [ -n "${CVE_UPDATES}" ]; then \
-        apt-get update && apt-get upgrade -y ${CVE_UPDATES} && \
-        rm -rf /var/lib/apt/lists/*; \
-    fi
 
 RUN mkdir -p /cuda-samples
 COPY --from=builder /build/${SAMPLE_NAME} /cuda-samples/${SAMPLE_NAME}
