@@ -40,11 +40,14 @@ jobs:
         - vectorAdd
         - nbody
         - deviceQuery
+        - simpleMultiGPU
         exclude:
         - dist: ubi8
           sample: deviceQuery
         - dist: ubi8
           sample: nbody
+        - dist: ubi8
+          sample: simpleMultiGPU
 
     steps:
       - uses: actions/checkout@v4

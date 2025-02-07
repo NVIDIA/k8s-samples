@@ -64,7 +64,7 @@ services:
         # acquire the exclusive compute context before the MPS control daemon.
         depends_on:
           - mps-daemon
-        build: cuda-samples
+        build: cuda-samples/nbody
         environment:
           - "NVIDIA_VISIBLE_DEVICES"
         runtime: nvidia
