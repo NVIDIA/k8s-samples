@@ -27,7 +27,7 @@ on:
         default: true
 
 jobs:
-  build:
+  build-cuda-samples:
     runs-on: linux-amd64-cpu4
     strategy:
       matrix:
@@ -38,11 +38,15 @@ jobs:
         - vectorAdd
         - nbody
         - deviceQuery
+        - nvbandwidth
         exclude:
         - dist: ubi9
           sample: deviceQuery
         - dist: ubi9
           sample: nbody
+        - dist: ubi9
+          sample: nvbandwidth
+
     steps:
       - uses: actions/checkout@v4
         name: Check out code
@@ -62,7 +66,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build image
+      - name: Build cuda sample image
         env:
           IMAGE_NAME: ghcr.io/nvidia/k8s-samples
           VERSION: ${{ inputs.version }}
