@@ -93,10 +93,7 @@ jobs:
           CUDA_VERSION: 12.5.0
           NVBANDWIDTH_VERSION: v0.7
           PUSH_ON_BUILD: true
+          BUILD_MULTI_ARCH_IMAGES: true
         run: |
           echo "nvbandwidth ${NVBANDWIDTH_VERSION}"
-          docker build --platform=linux/arm64 \
-            --build-arg CUDA_VERSION=${CUDA_VERSION} \
-            --build-arg NVBANDWIDTH_VERSION=${NVBANDWIDTH_VERSION} \
-            -t "${IMAGE_NAME}-${NVBANDWIDTH_VERSION}" \
-            -f multinodeNVL/nvbandwidth/Dockerfile .
+          make -f multinodeNVL/nvbandwidth/Makefile build
