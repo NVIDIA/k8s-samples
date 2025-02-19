@@ -37,6 +37,7 @@ stages:
   - e2e_tests
   - aws_kube_clean
   - release
+  - sign
 
 # Define the distribution targets
 .dist-ubuntu22.04:
