@@ -86,7 +86,7 @@ endif
 endif
 
 build-%: DIST = $(*)
-ifeq ($(SAMPLE),nbody)
+ifeq ($(SAMPLE),$(filter $(SAMPLE),nbody nvbandwidth))
 build-%: DOCKERFILE = $(CURDIR)/deployments/container/$(SAMPLE)/Dockerfile
 else
 build-%: DOCKERFILE = $(CURDIR)/deployments/container/Dockerfile.$(DOCKERFILE_SUFFIX)

@@ -12,9 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-ARG CUDA_VERSION=12.5.0
-
-FROM nvcr.io/nvidia/cuda:${CUDA_VERSION}-devel-ubuntu22.04 AS builder
+FROM nvcr.io/nvidia/cuda:12.6.2-devel-ubuntu22.04 AS builder
 
 ENV DEBIAN_FRONTEND=noninteractive
 
