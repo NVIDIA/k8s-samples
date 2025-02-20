@@ -24,7 +24,7 @@ WORKDIR /build
 
 ARG SAMPLE_NAME
 ENV SAMPLE_NAME ${SAMPLE_NAME}
-ARG CUDA_SAMPLES_VERSION=v11.6
+ARG CUDA_SAMPLES_VERSION=v12.0
 RUN curl -L https://codeload.github.com/NVIDIA/cuda-samples/tar.gz/refs/tags/${CUDA_SAMPLES_VERSION} | \
     tar -xzvf - --strip-components=1 --wildcards */${SAMPLE_NAME}/* --wildcards */Common/* && \
     cd $(find /build/Samples -iname "${SAMPLE_NAME}") && \
