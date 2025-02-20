@@ -53,6 +53,12 @@ TEST_TARGETS := $(patsubst %,test-%, $(DISTRIBUTIONS))
 
 .PHONY: $(DISTRIBUTIONS) $(PUSH_TARGETS) $(BUILD_TARGETS) $(TEST_TARGETS)
 
+# Certain samples do not allow multi-arch images. We disable them here.
+# TODO: Does it make more sense to set this at a CI-level?
+ifeq ($(SAMPLE),nbody)
+BUILD_MULTI_ARCH_IMAGES = false
+endif
+
 ifneq ($(BUILD_MULTI_ARCH_IMAGES),true)
 include $(CURDIR)/deployments/container/native-only.mk
 else
