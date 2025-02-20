@@ -45,13 +45,19 @@ OUT_IMAGE_TAG ?= $(LOWER_CASE_SAMPLE)-$(OUT_IMAGE_VERSION)-$(DIST)
 OUT_IMAGE = $(OUT_IMAGE_NAME):$(OUT_IMAGE_TAG)
 
 DEFAULT_PUSH_TARGET := ubuntu22.04
-DISTRIBUTIONS := ubuntu22.04 ubi8
+DISTRIBUTIONS := ubuntu22.04 ubi9
 
 BUILD_TARGETS := $(patsubst %,build-%, $(DISTRIBUTIONS))
 PUSH_TARGETS := $(patsubst %,push-%, $(DISTRIBUTIONS))
 TEST_TARGETS := $(patsubst %,test-%, $(DISTRIBUTIONS))
 
 .PHONY: $(DISTRIBUTIONS) $(PUSH_TARGETS) $(BUILD_TARGETS) $(TEST_TARGETS)
+
+# Certain samples do not allow multi-arch images. We disable them here.
+# TODO: Does it make more sense to set this at a CI-level?
+ifeq ($(SAMPLE),nbody)
+BUILD_MULTI_ARCH_IMAGES = false
+endif
 
 ifneq ($(BUILD_MULTI_ARCH_IMAGES),true)
 include $(CURDIR)/deployments/container/native-only.mk
@@ -80,11 +86,15 @@ endif
 endif
 
 build-%: DIST = $(*)
+ifeq ($(SAMPLE),nbody)
+build-%: DOCKERFILE = $(CURDIR)/deployments/container/$(SAMPLE)/Dockerfile
+else
 build-%: DOCKERFILE = $(CURDIR)/deployments/container/Dockerfile.$(DOCKERFILE_SUFFIX)
+endif
 
 build-ubuntu%: DOCKERFILE_SUFFIX = ubuntu
 
-build-ubi8: DOCKERFILE_SUFFIX = ubi8
+build-ubi9: DOCKERFILE_SUFFIX = ubi9
 
 # Use a generic build target to build the relevant images
 $(BUILD_TARGETS): build-%:
@@ -96,6 +106,5 @@ $(BUILD_TARGETS): build-%:
 		--tag $(IMAGE) \
 		--build-arg CUDA_SAMPLES_VERSION="$(CUDA_SAMPLES_VERSION)" \
 		--build-arg SAMPLE_NAME=$(SAMPLE) \
-		--build-arg CVE_UPDATES="$(CVE_UPDATES)" \
 		-f $(DOCKERFILE) \
 		$(CURDIR)

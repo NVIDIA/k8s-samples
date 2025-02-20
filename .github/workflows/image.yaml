@@ -22,8 +22,9 @@ on:
         required: true
         type: string
       build_multi_arch_images:
-        required: true
+        required: false
         type: string
+        default: true
 
 jobs:
   build:
@@ -32,15 +33,15 @@ jobs:
       matrix:
         dist:
         - ubuntu22.04
-        - ubi8
+        - ubi9
         sample:
         - vectorAdd
         - nbody
         - deviceQuery
         exclude:
-        - dist: ubi8
+        - dist: ubi9
           sample: deviceQuery
-        - dist: ubi8
+        - dist: ubi9
           sample: nbody
     steps:
       - uses: actions/checkout@v4
@@ -49,7 +50,7 @@ jobs:
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
         with:
-          image: tonistiigi/binfmt:master
+          image: tonistiigi/binfmt:qemu-v7.0.0-28
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
