@@ -80,7 +80,11 @@ endif
 endif
 
 build-%: DIST = $(*)
+ifeq ($(SAMPLE),nbody)
+build-%: DOCKERFILE = $(CURDIR)/deployments/container/$(SAMPLE)/Dockerfile
+else
 build-%: DOCKERFILE = $(CURDIR)/deployments/container/Dockerfile.$(DOCKERFILE_SUFFIX)
+endif
 
 build-ubuntu%: DOCKERFILE_SUFFIX = ubuntu
 
