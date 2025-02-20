@@ -1,0 +1,22 @@
+name: "basic checks"
+
+on:
+  workflow_call:
+    outputs:
+      version:
+        description: "The short SHA to use as a version string"
+        value: ${{ jobs.variables.outputs.version }}
+      golang_version:
+        description: "The golang version for this project"
+        value: ${{ jobs.variables.outputs.golang_version }}
+  pull_request:
+    types:
+      - opened
+      - synchronize
+    branches:
+      - main
+      - release-*
+
+jobs:
+  variables:
+    uses: ./.github/workflows/variables.yaml
