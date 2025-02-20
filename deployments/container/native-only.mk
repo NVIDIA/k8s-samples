@@ -12,7 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-DOCKER_BUILD_PLATFORM_OPTIONS = --platform=linux/amd64
+PUSH_ON_BUILD ?= false
+ARCH ?= $(shell uname -m)
+DOCKER_BUILD_PLATFORM_OPTIONS = --platform=linux/$(ARCH)
 
 $(PUSH_TARGETS): push-%:
 	$(DOCKER) tag "$(IMAGE)" "$(OUT_IMAGE)"
