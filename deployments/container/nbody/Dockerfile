@@ -12,14 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM nvcr.io/nvidia/cuda:12.6.2-devel-ubuntu22.04 AS builder
+FROM nvcr.io/nvidia/cuda:12.6.2-base-ubuntu22.04 AS builder
 
-ARG SAMPLE_NAME
-ENV SAMPLE_NAME ${SAMPLE_NAME}
+ARG SAMPLE_NAME=nbody
+ENV SAMPLE_NAME=${SAMPLE_NAME}
 
 ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y --no-install-recommends \
-        curl \
+        freeglut3-dev \
+        libgl1-mesa-dev \
+        libglu1-mesa-dev \
     && \
         rm -rf /var/lib/apt/lists/*
 
@@ -35,7 +37,7 @@ RUN curl -L https://codeload.github.com/NVIDIA/cuda-samples/tar.gz/refs/tags/${C
     cp $(find /build/bin -iname "${SAMPLE_NAME}") /build/${SAMPLE_NAME}
 
 FROM nvcr.io/nvidia/cuda:12.6.2-base-ubuntu22.04
-ARG SAMPLE_NAME=nbody
+ARG SAMPLE_NAME
 LABEL io.k8s.display-name="NVIDIA CUDA ${SAMPLE_NAME} sample"
 LABEL name="NVIDIA CUDA ${SAMPLE_NAME} sample"
 LABEL vendor="NVIDIA"
@@ -43,6 +45,14 @@ LABEL version="1.0.0"
 LABEL release="N/A"
 LABEL summary="NVIDIA container to validate GPU support"
 LABEL description="See summary"
+
+# The nbody sample requires libGL, libGLU, and libglut
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        freeglut3 \
+        libgl1 \
+        libglu1 \
+    && \
+        rm -rf /var/lib/apt/lists/* || :
 
 COPY ./LICENSE ./licenses/LICENSE
 
