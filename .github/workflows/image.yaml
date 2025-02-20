@@ -22,8 +22,9 @@ on:
         required: true
         type: string
       build_multi_arch_images:
-        required: true
+        required: false
         type: string
+        default: true
 
 jobs:
   build:
