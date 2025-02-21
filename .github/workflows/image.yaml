@@ -38,11 +38,15 @@ jobs:
         - vectorAdd
         - nbody
         - deviceQuery
+        - nvbandwidth
         exclude:
         - dist: ubi9
           sample: deviceQuery
         - dist: ubi9
           sample: nbody
+        - dist: ubi9
+          sample: nvbandwidth
+
     steps:
       - uses: actions/checkout@v4
         name: Check out code
