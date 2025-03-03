@@ -39,6 +39,7 @@ jobs:
         - nbody
         - deviceQuery
         - nvbandwidth
+        - simpleMultiGPU
         exclude:
         - dist: ubi9
           sample: deviceQuery
@@ -46,6 +47,8 @@ jobs:
           sample: nbody
         - dist: ubi9
           sample: nvbandwidth
+        - dist: ubi9
+          sample: simpleMultiGPU
 
     steps:
       - uses: actions/checkout@v4

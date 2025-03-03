@@ -90,6 +90,12 @@ image-nbody-ubuntu22.04:
     - .dist-ubuntu22.04
     - .sample-nbody
 
+image-simple-multi-gpu-ubuntu22.04:
+  extends:
+    - .image-pull
+    - .dist-ubuntu22.04
+    - .sample-simple-multi-gpu
+
 # The .scan step forms the base of the image scan operation performed before releasing
 # images.
 .scan:
@@ -198,6 +204,25 @@ scan-nbody-ubuntu22.04-arm64:
     - image-nbody-ubuntu22.04
     - scan-nbody-ubuntu22.04-amd64
 
+scan-simple-multi-gpu-ubuntu22.04-amd64:
+  extends:
+    - .scan
+    - .sample-simple-multi-gpu
+    - .dist-ubuntu22.04
+    - .platform-amd64
+  needs:
+    - image-simple-multi-gpu-ubuntu22.04
+
+scan-simple-multi-gpu-ubuntu22.04-arm64:
+  extends:
+    - .scan
+    - .sample-simple-multi-gpu
+    - .dist-ubuntu22.04
+    - .platform-arm64
+  needs:
+    - image-simple-multi-gpu-ubuntu22.04
+    - scan-simple-multi-gpu-ubuntu22.04-amd64
+
 # Define external release helpers
 .release:ngc:
   extends:
@@ -233,3 +258,9 @@ release:ngc-nbody-ubuntu22.04:
     - .release:ngc
     - .dist-ubuntu22.04
     - .sample-nbody
+
+release:ngc-simple-multi-gpu-ubuntu22.04:
+  extends:
+    - .release:ngc
+    - .dist-ubuntu22.04
+    - .sample-simple-multi-gpu
