@@ -75,6 +75,12 @@ stages:
     LOWER_CASE_SAMPLE: devicequery
     PUSH_SAMPLE_ONLY_TAG: "true"
 
+.sample-simple-multi-gpu:
+  variables:
+    SAMPLE: simpleMultiGPU
+    LOWER_CASE_SAMPLE: simplemultigpu
+    PUSH_SAMPLE_ONLY_TAG: "true"
+
 # Make buildx available as a docker CLI plugin
 .buildx-setup:
   before_script:
