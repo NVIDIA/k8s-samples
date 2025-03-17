@@ -38,7 +38,15 @@ RUN git clone --branch ${NVBANDWIDTH_VERSION} --depth 1 --single-branch https://
     cmake -DMULTINODE=1 . && \
     make -j$(nproc)
 
-FROM mpioperator/openmpi:v0.6.0
+FROM nvcr.io/nvidia/cuda:12.6.2-base-ubuntu22.04
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    openmpi-bin \
+    openmpi-common \
+    libopenmpi-dev \
+    openssh-client \
+    && rm -rf /var/lib/apt/lists/*
 
 COPY --from=builder /bandwidthtest/nvbandwidth/nvbandwidth /usr/bin
 
+ENTRYPOINT ["mpirun"]
