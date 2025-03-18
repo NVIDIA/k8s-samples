@@ -45,7 +45,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     openmpi-common \
     libopenmpi-dev \
     openssh-client \
+    openssh-server \
     && rm -rf /var/lib/apt/lists/*
+
+RUN mkdir -p /var/run/sshd
 
 COPY --from=builder /bandwidthtest/nvbandwidth/nvbandwidth /usr/bin
 
