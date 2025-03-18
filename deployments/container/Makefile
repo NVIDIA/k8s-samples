@@ -50,8 +50,20 @@ TEST_TARGETS := $(patsubst %,test-%, $(DISTRIBUTIONS))
 
 # Certain samples do not allow multi-arch images. We disable them here.
 # TODO: Does it make more sense to set this at a CI-level?
-ifeq ($(SAMPLE),nbody)
+AMD64_SAMPLES = vulkan
+ARM64_SAMPLES =
+SINGLE_ARCH_SAMPLES = nbody $(AMD64_SAMPLES) $(ARM64_SAMPLES)
+ifeq ($(SAMPLE),$(filter $(SAMPLE),$(SINGLE_ARCH_SAMPLES)))
+$(info Using single-architecture for $(SAMPLE))
 BUILD_MULTI_ARCH_IMAGES = false
+# Certain samples are only supported on AMD64.
+ifeq ($(SAMPLE),$(filter $(SAMPLE),$(AMD64_SAMPLES)))
+ARCH = amd64
+endif
+# Certain samples are only supported on AMD64.
+ifeq ($(SAMPLE),$(filter $(SAMPLE),$(ARM64_SAMPLES)))
+ARCH = arm64
+endif
 endif
 
 ifneq ($(BUILD_MULTI_ARCH_IMAGES),true)
@@ -82,7 +94,7 @@ endif
 
 build-%: DIST = $(*)
 # For the following samples, we use specific Dockerfiles:
-ifeq ($(SAMPLE),$(filter $(SAMPLE),nbody nvbandwidth))
+ifeq ($(SAMPLE),$(filter $(SAMPLE),nbody nvbandwidth vulkan))
 build-%: DOCKERFILE = $(CURDIR)/deployments/container/$(SAMPLE)/Dockerfile
 else
 build-%: DOCKERFILE = $(CURDIR)/deployments/container/Dockerfile.$(DOCKERFILE_SUFFIX)
