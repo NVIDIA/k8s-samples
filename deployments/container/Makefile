@@ -22,11 +22,6 @@ MKDIR  ?= mkdir
 
 include $(CURDIR)/versions.mk
 
-ifeq ($(IMAGE_NAME),)
-REGISTRY ?= nvidia
-IMAGE_NAME := $(REGISTRY)/cuda-sample
-endif
-
 # The Makefile describes the build process for a single CUDA sample: e.g. `vectorAdd`
 ifeq ($(SAMPLE),)
 # Use vectorAdd as the default sample
