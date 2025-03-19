@@ -14,10 +14,7 @@
 
 BUILD_MULTI_ARCH_IMAGES ?= false
 DOCKER ?= docker
-BUILDX  =
-ifeq ($(BUILD_MULTI_ARCH_IMAGES),true)
-BUILDX = buildx
-endif
+BUILDX =
 MKDIR  ?= mkdir
 
 include $(CURDIR)/versions.mk
@@ -42,9 +39,10 @@ OUT_IMAGE = $(OUT_IMAGE_NAME):$(OUT_IMAGE_TAG)
 DEFAULT_PUSH_TARGET := ubuntu22.04
 DISTRIBUTIONS := ubuntu22.04 ubi9
 
-BUILD_TARGETS := $(patsubst %,build-%, $(DISTRIBUTIONS))
-PUSH_TARGETS := $(patsubst %,push-%, $(DISTRIBUTIONS))
-TEST_TARGETS := $(patsubst %,test-%, $(DISTRIBUTIONS))
+IMAGE_TARGETS := $(patsubst %,image-%,$(DISTRIBUTIONS))
+BUILD_TARGETS := $(patsubst %,build-%,$(DISTRIBUTIONS))
+PUSH_TARGETS := $(patsubst %,push-%,$(DISTRIBUTIONS))
+TEST_TARGETS := $(patsubst %,test-%,$(DISTRIBUTIONS))
 
 .PHONY: $(DISTRIBUTIONS) $(PUSH_TARGETS) $(BUILD_TARGETS) $(TEST_TARGETS)
 
@@ -64,6 +62,11 @@ endif
 ifeq ($(SAMPLE),$(filter $(SAMPLE),$(ARM64_SAMPLES)))
 ARCH = arm64
 endif
+endif
+
+# If BUILD_MULTI_ARCH_IMAGES is still true for a given set of samples, we enable buildx.
+ifeq ($(BUILD_MULTI_ARCH_IMAGES),true)
+BUILDX = buildx
 endif
 
 ifneq ($(BUILD_MULTI_ARCH_IMAGES),true)
@@ -105,7 +108,7 @@ build-ubuntu%: DOCKERFILE_SUFFIX = ubuntu
 build-ubi9: DOCKERFILE_SUFFIX = ubi9
 
 # Use a generic build target to build the relevant images
-$(BUILD_TARGETS): build-%:
+$(IMAGE_TARGETS): image-%:
 	DOCKER_BUILDKIT=1 \
 		$(DOCKER) $(BUILDX) build --pull \
 		--provenance=false --sbom=false \
@@ -116,3 +119,20 @@ $(BUILD_TARGETS): build-%:
 		--build-arg SAMPLE_NAME=$(SAMPLE) \
 		-f $(DOCKERFILE) \
 		$(CURDIR)
+
+# Handle the default build target.
+.PHONY: build
+build: $(DEFAULT_PUSH_TARGET)
+$(DEFAULT_PUSH_TARGET): build-$(DEFAULT_PUSH_TARGET)
+$(DEFAULT_PUSH_TARGET): DIST = $(DEFAULT_PUSH_TARGET)
+
+REGCTL ?= regctl
+$(PUSH_TARGETS): push-%:
+	$(REGCTL) \
+	        image copy \
+	        $(IMAGE) $(OUT_IMAGE)
+
+push-short:
+	$(REGCTL) \
+	        image copy \
+	        $(IMAGE) $(OUT_IMAGE_NAME):$(OUT_IMAGE_VERSION)

@@ -16,14 +16,17 @@ PUSH_ON_BUILD ?= false
 ARCH ?= $(shell uname -m)
 DOCKER_BUILD_PLATFORM_OPTIONS = --platform=linux/$(ARCH)
 
-$(PUSH_TARGETS): push-%:
-	$(DOCKER) tag "$(IMAGE)" "$(OUT_IMAGE)"
-	$(DOCKER) push "$(OUT_IMAGE)"
+ifeq ($(PUSH_ON_BUILD),true)
+$(BUILD_TARGETS): build-%: image-%
+	$(DOCKER) push "$(IMAGE)"
+else
+$(BUILD_TARGETS): build-%: image-%
+endif
 
-push-short:
-	$(DOCKER) tag $(IMAGE) $(OUT_IMAGE_NAME):${LOWER_CASE_SAMPLE}-$(OUT_IMAGE_VERSION)
-	$(DOCKER) push $(OUT_IMAGE_NAME):${LOWER_CASE_SAMPLE}-$(OUT_IMAGE_VERSION)
-
-push-sample:
-	$(DOCKER) tag $(IMAGE) $(OUT_IMAGE_NAME):$(LOWER_CASE_SAMPLE)
-	$(DOCKER) push $(OUT_IMAGE_NAME):$(LOWER_CASE_SAMPLE)
+# For the default distribution we also retag the image.
+# Note: This needs to be updated for multi-arch images.
+ifeq ($(IMAGE_TAG),$(VERSION)-$(DIST))
+$(DEFAULT_PUSH_TARGET):
+	$(DOCKER) image inspect $(IMAGE) > /dev/null || $(DOCKER) pull $(IMAGE)
+	$(DOCKER) tag $(IMAGE) $(subst :$(IMAGE_TAG),:$(VERSION),$(IMAGE))
+endif
