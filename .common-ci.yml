@@ -81,6 +81,13 @@ stages:
     LOWER_CASE_SAMPLE: simplemultigpu
     PUSH_SAMPLE_ONLY_TAG: "true"
 
+# Define the sample targets
+.sample-vulkan:
+  variables:
+    SAMPLE: vulkan
+    LOWER_CASE_SAMPLE: vulkan
+    PUSH_SAMPLE_ONLY_TAG: "true"
+
 # Make buildx available as a docker CLI plugin
 .buildx-setup:
   before_script:
@@ -183,4 +190,12 @@ release:staging-device-query-ubuntu22.04:
     - .sample-device-query
   needs:
     - image-device-query-ubuntu22.04
+
+release:staging-vulkan:
+  extends:
+    - .release:staging
+    - .dist-ubuntu22.04
+    - .sample-vulkan
+  needs:
+    - image-vulkan-ubuntu22.04
 
