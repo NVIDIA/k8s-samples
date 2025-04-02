@@ -40,6 +40,7 @@ jobs:
         - deviceQuery
         - nvbandwidth
         - simpleMultiGPU
+        - vulkan
         exclude:
         - dist: ubi9
           sample: deviceQuery
@@ -49,6 +50,8 @@ jobs:
           sample: nvbandwidth
         - dist: ubi9
           sample: simpleMultiGPU
+        - dist: ubi9
+          sample: vulkan
 
     steps:
       - uses: actions/checkout@v4
