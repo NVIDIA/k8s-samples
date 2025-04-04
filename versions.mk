@@ -13,7 +13,7 @@
 # limitations under the License.
 
 # Specify the CUDA base image version
-VERSION ?= cuda$(shell  grep -Eo "FROM.*cuda:[0-9\.]+" deployments/container/Dockerfile.ubuntu | sort -u | sed 's/.*://g')
+VERSION ?= cuda$(shell  grep -Eo "FROM.*cuda:[0-9\.]+" deployments/container/Dockerfile | sort -u | sed 's/.*://g')
 
 # Specify the tag for the https://github.com/NVIDIA/cuda-samples repository.
 # This need not match the CUDA_VERSION above.
