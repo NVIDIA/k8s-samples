@@ -21,8 +21,7 @@ include $(CURDIR)/versions.mk
 
 # The Makefile describes the build process for a single CUDA sample: e.g. `vectorAdd`
 ifeq ($(SAMPLE),)
-# Use vectorAdd as the default sample
-	SAMPLE := vectorAdd
+$(error "SAMPLE is unset")
 endif
 LOWER_CASE_SAMPLE := $(shell echo $(SAMPLE) | tr '[:upper:]' '[:lower:]')
 
@@ -76,24 +75,11 @@ include $(CURDIR)/deployments/container/multi-arch.mk
 endif
 
 push-%: DIST = $(*)
-push-short: DIST = $(DEFAULT_PUSH_TARGET)
-push-sample: DIST = $(DEFAULT_PUSH_TARGET)
 
-# For the default push target we also push a short tag equal to the version.
-# We skip this for the development release
-DEVEL_RELEASE_IMAGE_VERSION ?= devel
-PUSH_MULTIPLE_TAGS ?= true
-PUSH_SAMPLE_ONLY_TAG ?= false
-ifeq ($(strip $(OUT_IMAGE_VERSION)),$(DEVEL_RELEASE_IMAGE_VERSION))
-PUSH_MULTIPLE_TAGS = false
-endif
-ifeq ($(PUSH_MULTIPLE_TAGS),true)
-push-$(DEFAULT_PUSH_TARGET): push-short
-# If required we retag and push the image tagged only with the sample name
-ifeq ($(PUSH_SAMPLE_ONLY_TAG),true)
-push-$(DEFAULT_PUSH_TARGET): push-sample
-endif
-endif
+# For the default push target we also push a short tag equal to the sample and version.
+SHORT_IMAGE_TAG = $(LOWER_CASE_SAMPLE)-$(OUT_IMAGE_VERSION)
+SAMPLE_ONLY_IMAGE_TAG = $(LOWER_CASE_SAMPLE)
+push-$(DEFAULT_PUSH_TARGET): OUT_IMAGE_ALIASES = $(patsubst %,$(OUT_IMAGE_NAME):%,$(SHORT_IMAGE_TAG) $(SAMPLE_ONLY_IMAGE_TAG))
 
 build-%: DIST = $(*)
 # For the following samples, we use specific Dockerfiles:
@@ -120,19 +106,11 @@ $(IMAGE_TARGETS): image-%:
 		-f $(DOCKERFILE) \
 		$(CURDIR)
 
-# Handle the default build target.
-.PHONY: build
-build: $(DEFAULT_PUSH_TARGET)
-$(DEFAULT_PUSH_TARGET): build-$(DEFAULT_PUSH_TARGET)
-$(DEFAULT_PUSH_TARGET): DIST = $(DEFAULT_PUSH_TARGET)
 
-REGCTL ?= regctl
-$(PUSH_TARGETS): push-%:
-	$(REGCTL) \
-	        image copy \
-	        $(IMAGE) $(OUT_IMAGE)
-
-push-short:
-	$(REGCTL) \
-	        image copy \
-	        $(IMAGE) $(OUT_IMAGE_NAME):$(OUT_IMAGE_VERSION)
+# If PUSH_ON_BUILD is set
+ifeq ($(PUSH_ON_BUILD),true)
+$(BUILD_TARGETS): build-%: image-%
+	$(CURDIR)/hack/publish-images.sh $(IMAGE) $(OUT_IMAGE) $(OUT_IMAGE_ALIASES)
+else
+$(BUILD_TARGETS): build-%: image-%
+endif

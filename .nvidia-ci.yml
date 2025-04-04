@@ -13,7 +13,7 @@
 # limitations under the License.
 
 include:
-  - local: '.common-ci.yml'
+  - local: ".common-ci.yml"
 
 default:
   tags:
@@ -47,7 +47,6 @@ variables:
     OUT_REGISTRY: "${CI_REGISTRY}"
     OUT_IMAGE_NAME: ${CI_REGISTRY_IMAGE}/cuda-samples
     OUT_VERSION: ${LOWER_CASE_SAMPLE}-${CI_COMMIT_SHORT_SHA}
-    PUSH_MULTIPLE_TAGS: "false"
   # We delay the job start to allow the public pipeline to generate the required images.
   when: delayed
   start_in: 30 minutes
@@ -64,7 +63,8 @@ variables:
       regctl manifest get ${IN_REGISTRY}/${IN_IMAGE_NAME}:${IN_VERSION}-${DIST} --list > /dev/null && echo "${IN_REGISTRY}/${IN_IMAGE_NAME}:${IN_VERSION}-${DIST}" || ( echo "${IN_REGISTRY}/${IN_IMAGE_NAME}:${IN_VERSION}-${DIST} does not exist" && sleep infinity )
   script:
     - regctl registry login "${OUT_REGISTRY}" -u "${OUT_REGISTRY_USER}" -p "${OUT_REGISTRY_TOKEN}"
-    - make -f deployments/container/Makefile IMAGE=${IN_REGISTRY}/${IN_IMAGE_NAME}:${IN_VERSION}-${DIST} OUT_IMAGE=${OUT_IMAGE_NAME}:${OUT_VERSION}-${DIST} push-${DIST}
+    # We use the publish-images.sh script to pull the images from IN_REGISTRY into the CI_REGISTRY.
+    - ./hack/publish-images.sh ${IN_REGISTRY}/${IN_IMAGE_NAME}:${IN_VERSION}-${DIST} ${OUT_IMAGE_NAME}:${OUT_VERSION}-${DIST}
 
 image-vectoradd-ubuntu22.04:
   extends:

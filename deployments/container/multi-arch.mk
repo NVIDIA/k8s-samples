@@ -16,4 +16,8 @@ PUSH_ON_BUILD ?= false
 DOCKER_BUILD_OPTIONS = --output=type=image,push=$(PUSH_ON_BUILD)
 DOCKER_BUILD_PLATFORM_OPTIONS = --platform=linux/amd64,linux/arm64
 
-$(BUILD_TARGETS): build-%: image-%
+# If we're using --putput=type=image,push=true we need
+# to skip the first image in the list of images passed to either
+# publish-images.sh script.
+# TODO: Is there a more "stable" way to handle this.
+SKIP_FIRST_IMAGE_ON_PUBLISH = $(PUSH_ON_BUILD)
