@@ -14,9 +14,6 @@
 
 FROM nvcr.io/nvidia/cuda:12.9.1-base-ubuntu22.04 AS builder
 
-ARG SAMPLE_NAME
-ENV SAMPLE_NAME=${SAMPLE_NAME}
-
 ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y --no-install-recommends \
         build-essential \
@@ -29,7 +26,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 WORKDIR /build
 
-ARG TARGETARCH
+ARG SAMPLE_NAME
+ENV SAMPLE_NAME=${SAMPLE_NAME}
 
 ARG CUDA_SAMPLES_VERSION=v12.9
 RUN curl -L https://codeload.github.com/NVIDIA/cuda-samples/tar.gz/refs/tags/${CUDA_SAMPLES_VERSION} | \
@@ -40,11 +38,14 @@ RUN curl -L https://codeload.github.com/NVIDIA/cuda-samples/tar.gz/refs/tags/${C
     cp ${SAMPLE_NAME} /build/${SAMPLE_NAME}
 
 FROM nvcr.io/nvidia/cuda:12.9.1-base-ubuntu22.04
+
 ARG SAMPLE_NAME
+ARG VERSION
+
 LABEL io.k8s.display-name="NVIDIA CUDA ${SAMPLE_NAME} sample"
 LABEL name="NVIDIA CUDA ${SAMPLE_NAME} sample"
 LABEL vendor="NVIDIA"
-LABEL version="1.0.0"
+LABEL version="${VERSION}"
 LABEL release="N/A"
 LABEL summary="NVIDIA container to validate GPU support"
 LABEL description="See summary"
@@ -55,4 +56,5 @@ RUN mkdir -p /cuda-samples
 COPY --from=builder /build/${SAMPLE_NAME} /cuda-samples/${SAMPLE_NAME}
 
 RUN ln -s /cuda-samples/${SAMPLE_NAME} /cuda-samples/sample
+
 ENTRYPOINT ["/cuda-samples/sample"]
