@@ -12,25 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM nvcr.io/nvidia/cuda:12.9.1-base-ubuntu22.04 AS builder
+FROM nvcr.io/nvidia/cuda:12.9.1-base-ubi9 AS builder
 
-ARG SAMPLE_NAME
-ENV SAMPLE_NAME=${SAMPLE_NAME}
-
-ARG DEBIAN_FRONTEND=noninteractive
-RUN apt-get update && apt-get install -y --no-install-recommends \
-        build-essential \
+RUN dnf install -y --allowerasing \
         cmake \
+        cuda-cudart-devel-12-9 \
         cuda-nvcc-12-9 \
         g++ \
         curl \
     && \
-        rm -rf /var/lib/apt/lists/*
+    dnf clean all
 
 WORKDIR /build
 
-ARG TARGETARCH
-
+ARG SAMPLE_NAME
+ENV SAMPLE_NAME=${SAMPLE_NAME}
 ARG CUDA_SAMPLES_VERSION=v12.9
 RUN curl -L https://codeload.github.com/NVIDIA/cuda-samples/tar.gz/refs/tags/${CUDA_SAMPLES_VERSION} | \
     tar -xzvf - --strip-components=1 --wildcards */${SAMPLE_NAME}/* --wildcards */Common/* && \
@@ -39,7 +35,8 @@ RUN curl -L https://codeload.github.com/NVIDIA/cuda-samples/tar.gz/refs/tags/${C
     make && \
     cp ${SAMPLE_NAME} /build/${SAMPLE_NAME}
 
-FROM nvcr.io/nvidia/cuda:12.9.1-base-ubuntu22.04
+FROM nvcr.io/nvidia/cuda:12.9.1-base-ubi9
+
 ARG SAMPLE_NAME
 LABEL io.k8s.display-name="NVIDIA CUDA ${SAMPLE_NAME} sample"
 LABEL name="NVIDIA CUDA ${SAMPLE_NAME} sample"

@@ -32,27 +32,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        dist:
-        - ubuntu22.04
-        - ubi9
         sample:
-        - vectorAdd
+        - devicequery
         - nbody
-        - deviceQuery
         - nvbandwidth
-        - simpleMultiGPU
+        - simplemultigpu
+        - vectoradd
         - vulkan
-        exclude:
-        - dist: ubi9
-          sample: deviceQuery
-        - dist: ubi9
-          sample: nbody
-        - dist: ubi9
-          sample: nvbandwidth
-        - dist: ubi9
-          sample: simpleMultiGPU
-        - dist: ubi9
-          sample: vulkan
 
     steps:
       - uses: actions/checkout@v4
@@ -78,7 +64,6 @@ jobs:
           IMAGE_NAME: ghcr.io/nvidia/k8s-samples
           VERSION: ${{ inputs.version }}
           PUSH_ON_BUILD: true
-          BUILD_MULTI_ARCH_IMAGES: ${{ inputs.build_multi_arch_images }}
         run: |
-          echo "Building ${{ matrix.sample }} on ${{ matrix.dist }}"
-          SAMPLE=${{ matrix.sample }} make -f deployments/container/Makefile build-${{ matrix.dist }}
+          echo "Building ${{ matrix.sample }}"
+          make -f deployments/container/Makefile build-${{ matrix.sample }}
