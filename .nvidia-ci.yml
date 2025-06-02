@@ -102,6 +102,12 @@ image-vulkan-ubuntu22.04:
     - .dist-ubuntu22.04
     - .sample-vulkan
 
+image-nvbandwidth-ubuntu22.04:
+  extends:
+    - .image-pull
+    - .dist-ubuntu22.04
+    - .sample-nvbandwidth
+
 # The .scan step forms the base of the image scan operation performed before releasing
 # images.
 .scan:
@@ -248,6 +254,25 @@ scan-vulkan-ubuntu22.04-arm64:
     - image-vulkan-ubuntu22.04
     - scan-vulkan-ubuntu22.04-amd64
 
+scan-nvbandwidth-ubuntu22.04-amd64:
+  extends:
+    - .scan
+    - .sample-nvbandwidth
+    - .dist-ubuntu22.04
+    - .platform-amd64
+  needs:
+    - image-nvbandwidth-ubuntu22.04
+
+scan-nvbandwidth-ubuntu22.04-arm64:
+  extends:
+    - .scan
+    - .sample-nvbandwidth
+    - .dist-ubuntu22.04
+    - .platform-arm64
+  needs:
+    - image-nvbandwidth-ubuntu22.04
+    - scan-nvbandwidth-ubuntu22.04-amd64
+
 # Define external release helpers
 .release:ngc:
   extends:
@@ -295,3 +320,9 @@ release:ngc-vulkan-ubuntu22.04:
     - .release:ngc
     - .dist-ubuntu22.04
     - .sample-vulkan
+
+release:ngc-nvbandwidth-ubuntu22.04:
+  extends:
+    - .release:ngc
+    - .dist-ubuntu22.04
+    - .sample-nvbandwidth
