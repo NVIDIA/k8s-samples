@@ -88,6 +88,12 @@ stages:
     LOWER_CASE_SAMPLE: vulkan
     PUSH_SAMPLE_ONLY_TAG: "true"
 
+.sample-nvbandwidth:
+  variables:
+    SAMPLE: nvbandwidth
+    LOWER_CASE_SAMPLE: nvbandwidth
+    PUSH_SAMPLE_ONLY_TAG: "true"
+
 # Make buildx available as a docker CLI plugin
 .buildx-setup:
   before_script:
@@ -199,3 +205,10 @@ release:staging-vulkan:
   needs:
     - image-vulkan-ubuntu22.04
 
+release:staging-nvbandwidth:
+  extends:
+    - .release:staging
+    - .dist-ubuntu22.04
+    - .sample-nvbandwidth
+  needs:
+    - image-nvbandwidth-ubuntu22.04
