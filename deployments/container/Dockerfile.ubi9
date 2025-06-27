@@ -16,7 +16,7 @@ FROM nvcr.io/nvidia/cuda:12.9.1-devel-ubi9 AS builder
 
 ARG CUDA_VERSION
 RUN dnf install -y --allowerasing  \
-        curl \
+        curl cmake \
     && \
     dnf clean all
 
@@ -24,12 +24,13 @@ WORKDIR /build
 
 ARG SAMPLE_NAME
 ENV SAMPLE_NAME ${SAMPLE_NAME}
-ARG CUDA_SAMPLES_VERSION=v12.0
+ARG CUDA_SAMPLES_VERSION=v12.9
 RUN curl -L https://codeload.github.com/NVIDIA/cuda-samples/tar.gz/refs/tags/${CUDA_SAMPLES_VERSION} | \
     tar -xzvf - --strip-components=1 --wildcards */${SAMPLE_NAME}/* --wildcards */Common/* && \
     cd $(find /build/Samples -iname "${SAMPLE_NAME}") && \
-    make build && \
-    cp $(find /build/bin -iname "${SAMPLE_NAME}") /build/${SAMPLE_NAME}
+    cmake . && \
+    make && \
+    cp ${SAMPLE_NAME} /build/${SAMPLE_NAME}
 
 FROM nvcr.io/nvidia/cuda:12.9.1-base-ubi9
 ARG SAMPLE_NAME
