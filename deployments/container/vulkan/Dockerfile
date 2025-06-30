@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM nvcr.io/nvidia/cuda:12.8.1-base-ubuntu22.04 AS builder
+FROM nvcr.io/nvidia/cuda:12.9.1-base-ubuntu22.04 AS builder
 
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update -y && apt-get install -y --no-install-recommends \
@@ -63,7 +63,7 @@ RUN git clone --depth=1 https://github.com/SaschaWillems/Vulkan.git \
     && cmake -D RESOURCE_INSTALL_DIR=/cuda-samples ..  \
     && make ${BUILD_EXAMPLES}
 
-FROM nvcr.io/nvidia/cuda:12.8.1-base-ubuntu22.04
+FROM nvcr.io/nvidia/cuda:12.9.1-base-ubuntu22.04
 
 LABEL io.k8s.display-name="NVIDIA CUDA Vulkan samples"
 LABEL name="NVIDIA CUDA Vulkan samples"
