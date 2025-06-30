@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM nvcr.io/nvidia/cuda:12.6.2-devel-ubuntu22.04 AS builder
+FROM nvcr.io/nvidia/cuda:12.9.1-devel-ubuntu22.04 AS builder
 
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -38,7 +38,7 @@ RUN git clone --branch ${NVBANDWIDTH_VERSION} --depth 1 --single-branch https://
     cmake -DMULTINODE=1 . && \
     make -j$(nproc)
 
-FROM nvcr.io/nvidia/cuda:12.6.2-base-ubuntu22.04
+FROM nvcr.io/nvidia/cuda:12.9.1-base-ubuntu22.04
 
 ARG port=2222
 
