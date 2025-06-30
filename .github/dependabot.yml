@@ -4,7 +4,8 @@
 version: 2
 updates:
   - package-ecosystem: "docker"
-    directory: "/deployments/container"
+    directories:
+      - "/deployments/container/*"
     schedule:
       interval: "daily"
 
