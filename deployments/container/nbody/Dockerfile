@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM nvcr.io/nvidia/cuda:12.9.1-base-ubuntu22.04 AS builder
+FROM nvcr.io/nvidia/cuda:12.9.1-devel-ubuntu22.04 AS builder
 
 ARG SAMPLE_NAME=nbody
 ENV SAMPLE_NAME=${SAMPLE_NAME}
