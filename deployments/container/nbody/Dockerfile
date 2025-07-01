@@ -12,21 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM nvcr.io/nvidia/cuda:12.9.1-devel-ubuntu22.04 AS builder
+FROM nvcr.io/nvidia/cuda:12.9.1-base-ubuntu22.04 AS builder
 
 ARG SAMPLE_NAME=nbody
 ENV SAMPLE_NAME=${SAMPLE_NAME}
 
 ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y --no-install-recommends \
-        cuda-nvcc-12-6 \
         build-essential \
+        cmake \
+        cuda-nvcc-12-9 \
         g++ \
         curl \
         freeglut3-dev \
         libgl1-mesa-dev \
         libglu1-mesa-dev \
-        cmake \
     && \
         rm -rf /var/lib/apt/lists/*
 
@@ -43,7 +43,7 @@ RUN curl -L https://codeload.github.com/NVIDIA/cuda-samples/tar.gz/refs/tags/${C
     cp ${SAMPLE_NAME} /build/${SAMPLE_NAME}
 
 FROM nvcr.io/nvidia/cuda:12.9.1-base-ubuntu22.04
-ARG SAMPLE_NAME
+ARG SAMPLE_NAME=nbody
 LABEL io.k8s.display-name="NVIDIA CUDA ${SAMPLE_NAME} sample"
 LABEL name="NVIDIA CUDA ${SAMPLE_NAME} sample"
 LABEL vendor="NVIDIA"

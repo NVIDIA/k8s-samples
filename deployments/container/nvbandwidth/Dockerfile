@@ -12,22 +12,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM nvcr.io/nvidia/cuda:12.9.1-devel-ubuntu22.04 AS builder
+FROM nvcr.io/nvidia/cuda:12.9.1-base-ubuntu22.04 AS builder
 
-ENV DEBIAN_FRONTEND=noninteractive
-
+ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential \
-    git \
-    cmake \
-    g++ \
-    gcc \
-    make \
-    libboost-program-options-dev \
-    openmpi-bin \
-    openmpi-common \
-    libopenmpi-dev && \
-    rm -rf /var/lib/apt/lists/*
+        build-essential \
+        cmake \
+        cuda-nvcc-12-9 \
+        cuda-nvml-dev-12-9 \
+        g++ \
+        git \
+        gcc \
+        make \
+        libboost-program-options-dev \
+        openmpi-bin \
+        openmpi-common \
+        libopenmpi-dev \
+    && \
+        rm -rf /var/lib/apt/lists/*
 
 WORKDIR /bandwidthtest
 
