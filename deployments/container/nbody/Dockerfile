@@ -19,8 +19,9 @@ ENV SAMPLE_NAME=${SAMPLE_NAME}
 
 ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y --no-install-recommends \
-        cuda-nvcc-12-6 \
         build-essential \
+        cmake \
+        cuda-nvcc-12-9 \
         g++ \
         curl \
         freeglut3-dev \
@@ -33,15 +34,16 @@ WORKDIR /build
 
 ARG TARGETARCH
 
-ARG CUDA_SAMPLES_VERSION=v12.0
+ARG CUDA_SAMPLES_VERSION=v12.9
 RUN curl -L https://codeload.github.com/NVIDIA/cuda-samples/tar.gz/refs/tags/${CUDA_SAMPLES_VERSION} | \
     tar -xzvf - --strip-components=1 --wildcards */${SAMPLE_NAME}/* --wildcards */Common/* && \
     cd $(find /build/Samples -iname "${SAMPLE_NAME}") && \
-    make build && \
-    cp $(find /build/bin -iname "${SAMPLE_NAME}") /build/${SAMPLE_NAME}
+    cmake . && \
+    make && \
+    cp ${SAMPLE_NAME} /build/${SAMPLE_NAME}
 
 FROM nvcr.io/nvidia/cuda:12.9.1-base-ubuntu22.04
-ARG SAMPLE_NAME
+ARG SAMPLE_NAME=nbody
 LABEL io.k8s.display-name="NVIDIA CUDA ${SAMPLE_NAME} sample"
 LABEL name="NVIDIA CUDA ${SAMPLE_NAME} sample"
 LABEL vendor="NVIDIA"

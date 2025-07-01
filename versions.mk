@@ -17,7 +17,7 @@ VERSION ?= cuda$(shell  grep -Eo "FROM.*cuda:[0-9\.]+" deployments/container/Doc
 
 # Specify the tag for the https://github.com/NVIDIA/cuda-samples repository.
 # This need not match the CUDA_VERSION above.
-CUDA_SAMPLES_VERSION := v12.0
+CUDA_SAMPLES_VERSION := v12.9
 
 ifeq ($(IMAGE_NAME),)
 REGISTRY ?= nvcr.io/nvidia/k8s
