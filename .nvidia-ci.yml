@@ -137,7 +137,7 @@ scan-images:
   script:
     - |
       docker login -u "${CI_REGISTRY_USER}" -p "${CI_REGISTRY_PASSWORD}" "${CI_REGISTRY}"
-      export SCAN_IMAGE=${IMAGE}:${SAMPLE}-:${CI_COMMIT_SHORT_SHA}
+      export SCAN_IMAGE=${IMAGE}:${SAMPLE}-${CI_COMMIT_SHORT_SHA}
       echo "Scanning image ${SCAN_IMAGE} for ${PLATFORM}"
       docker pull --platform="${PLATFORM}" "${SCAN_IMAGE}"
       docker save "${SCAN_IMAGE}" -o "${IMAGE_ARCHIVE}"
