@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM nvcr.io/nvidia/cuda:12.9.1-base-ubuntu22.04 AS builder
+FROM nvcr.io/nvidia/cuda:13.0.0-base-ubuntu22.04 AS builder
 
 ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -37,7 +37,7 @@ RUN curl -L https://codeload.github.com/NVIDIA/cuda-samples/tar.gz/refs/tags/${C
     make && \
     cp ${SAMPLE_NAME} /build/${SAMPLE_NAME}
 
-FROM nvcr.io/nvidia/cuda:12.9.1-base-ubuntu22.04
+FROM nvcr.io/nvidia/cuda:13.0.0-base-ubuntu22.04
 
 ARG SAMPLE_NAME
 ARG VERSION
