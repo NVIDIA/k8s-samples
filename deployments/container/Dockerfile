@@ -24,6 +24,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && \
         rm -rf /var/lib/apt/lists/*
 
+# TODO: The cuda-nvvcc-12-9 package should either depend on the CUDA version or
+# the sample version. IFF we match the sample version, we need to also ensure
+# that the right alternative is used here.
+RUN update-alternatives --set cuda /usr/local/cuda-12.9
+
 WORKDIR /build
 
 ARG SAMPLE_NAME
