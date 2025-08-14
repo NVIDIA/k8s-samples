@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM nvcr.io/nvidia/cuda:12.9.1-base-ubuntu22.04 AS builder
+FROM nvcr.io/nvidia/cuda:13.0.0-base-ubuntu22.04 AS builder
 
 ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -23,6 +23,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         curl \
     && \
         rm -rf /var/lib/apt/lists/*
+
+# TODO: The cuda-nvvcc-12-9 package should either depend on the CUDA version or
+# the sample version. IFF we match the sample version, we need to also ensure
+# that the right alternative is used here.
+RUN update-alternatives --set cuda /usr/local/cuda-12.9
 
 WORKDIR /build
 
@@ -37,7 +42,7 @@ RUN curl -L https://codeload.github.com/NVIDIA/cuda-samples/tar.gz/refs/tags/${C
     make && \
     cp ${SAMPLE_NAME} /build/${SAMPLE_NAME}
 
-FROM nvcr.io/nvidia/cuda:12.9.1-base-ubuntu22.04
+FROM nvcr.io/nvidia/cuda:13.0.0-base-ubuntu22.04
 
 ARG SAMPLE_NAME
 ARG VERSION
