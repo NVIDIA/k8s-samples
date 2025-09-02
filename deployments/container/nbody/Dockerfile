@@ -21,7 +21,7 @@ ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y --no-install-recommends \
         build-essential \
         cmake \
-        cuda-nvcc-12-9 \
+        cuda-nvcc-13-0 \
         g++ \
         curl \
         freeglut3-dev \
@@ -34,7 +34,7 @@ WORKDIR /build
 
 ARG TARGETARCH
 
-ARG CUDA_SAMPLES_VERSION=v12.9
+ARG CUDA_SAMPLES_VERSION=v13.0
 RUN curl -L https://codeload.github.com/NVIDIA/cuda-samples/tar.gz/refs/tags/${CUDA_SAMPLES_VERSION} | \
     tar -xzvf - --strip-components=1 --wildcards */${SAMPLE_NAME}/* --wildcards */Common/* && \
     cd $(find /build/Samples -iname "${SAMPLE_NAME}") && \
