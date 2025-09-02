@@ -12,14 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM nvcr.io/nvidia/cuda:12.9.1-base-ubuntu22.04 AS builder
+FROM nvcr.io/nvidia/cuda:13.0.0-base-ubuntu22.04 AS builder
 
 ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y --no-install-recommends \
         build-essential \
         cmake \
-        cuda-nvcc-12-9 \
-        cuda-nvml-dev-12-9 \
+        cuda-nvcc-13-0 \
+        cuda-nvml-dev-13-0 \
         g++ \
         git \
         gcc \
@@ -40,7 +40,7 @@ RUN git clone --branch ${NVBANDWIDTH_VERSION} --depth 1 --single-branch https://
     cmake -DMULTINODE=1 . && \
     make -j$(nproc)
 
-FROM nvcr.io/nvidia/cuda:12.9.1-base-ubuntu22.04
+FROM nvcr.io/nvidia/cuda:13.0.0-base-ubuntu22.04
 
 ARG port=2222
 
