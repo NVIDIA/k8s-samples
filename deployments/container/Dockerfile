@@ -18,23 +18,18 @@ ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y --no-install-recommends \
         build-essential \
         cmake \
-        cuda-nvcc-12-9 \
+        cuda-nvcc-13-0 \
         g++ \
         curl \
     && \
         rm -rf /var/lib/apt/lists/*
-
-# TODO: The cuda-nvvcc-12-9 package should either depend on the CUDA version or
-# the sample version. IFF we match the sample version, we need to also ensure
-# that the right alternative is used here.
-RUN update-alternatives --set cuda /usr/local/cuda-12.9
 
 WORKDIR /build
 
 ARG SAMPLE_NAME
 ENV SAMPLE_NAME=${SAMPLE_NAME}
 
-ARG CUDA_SAMPLES_VERSION=v12.9
+ARG CUDA_SAMPLES_VERSION=v13.0
 RUN curl -L https://codeload.github.com/NVIDIA/cuda-samples/tar.gz/refs/tags/${CUDA_SAMPLES_VERSION} | \
     tar -xzvf - --strip-components=1 --wildcards */${SAMPLE_NAME}/* --wildcards */Common/* && \
     cd $(find /build/Samples -iname "${SAMPLE_NAME}") && \
