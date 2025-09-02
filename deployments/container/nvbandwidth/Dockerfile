@@ -18,8 +18,8 @@ ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y --no-install-recommends \
         build-essential \
         cmake \
-        cuda-nvcc-12-9 \
-        cuda-nvml-dev-12-9 \
+        cuda-nvcc-13-0 \
+        cuda-nvml-dev-13-0 \
         g++ \
         git \
         gcc \
