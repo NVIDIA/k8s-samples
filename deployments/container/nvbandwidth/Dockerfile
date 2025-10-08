@@ -52,7 +52,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     openssh-server \
     && rm -rf /var/lib/apt/lists/*
 
-RUN mkdir -p /var/run/sshd
+# Installing openssh-server, install host keys in post-install as flaged by scanner
+RUN rm -f /etc/ssh/ssh_host_* && mkdir -p /var/run/sshd
 
 # Got it from mpi-operator/build/base/Dockerfile
 # Allow OpenSSH to talk to containers without asking for confirmation
