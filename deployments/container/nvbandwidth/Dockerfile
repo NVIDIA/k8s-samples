@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM nvcr.io/nvidia/cuda:13.0.0-base-ubuntu22.04 AS builder
+FROM nvcr.io/nvidia/cuda:13.0.1-base-ubuntu24.04 AS builder
 
 ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -40,7 +40,7 @@ RUN git clone --branch ${NVBANDWIDTH_VERSION} --depth 1 --single-branch https://
     cmake -DMULTINODE=1 . && \
     make -j$(nproc)
 
-FROM nvcr.io/nvidia/cuda:13.0.0-base-ubuntu22.04
+FROM nvcr.io/nvidia/cuda:13.0.1-base-ubuntu24.04
 
 ARG port=2222
 
