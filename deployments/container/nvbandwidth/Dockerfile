@@ -44,16 +44,17 @@ FROM nvcr.io/nvidia/cuda:13.0.1-base-ubuntu24.04
 
 ARG port=2222
 
+# Installing openssh-server, install host keys in post-install as flaged by scanner
 RUN apt-get update && apt-get install -y --no-install-recommends \
     openmpi-bin \
     openmpi-common \
     libopenmpi-dev \
     openssh-client \
     openssh-server \
+    && rm -f /etc/ssh/ssh_host_* \
     && rm -rf /var/lib/apt/lists/*
 
-# Installing openssh-server, install host keys in post-install as flaged by scanner
-RUN rm -f /etc/ssh/ssh_host_* && mkdir -p /var/run/sshd
+RUN mkdir -p /var/run/sshd
 
 # Got it from mpi-operator/build/base/Dockerfile
 # Allow OpenSSH to talk to containers without asking for confirmation
