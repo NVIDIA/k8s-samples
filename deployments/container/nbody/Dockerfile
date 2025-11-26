@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM nvcr.io/nvidia/cuda:13.0.0-base-ubuntu22.04 AS builder
+FROM nvcr.io/nvidia/cuda:13.0.2-base-ubuntu22.04 AS builder
 
 ARG SAMPLE_NAME=nbody
 ENV SAMPLE_NAME=${SAMPLE_NAME}
@@ -42,7 +42,7 @@ RUN curl -L https://codeload.github.com/NVIDIA/cuda-samples/tar.gz/refs/tags/${C
     make && \
     cp ${SAMPLE_NAME} /build/${SAMPLE_NAME}
 
-FROM nvcr.io/nvidia/cuda:13.0.0-base-ubuntu22.04
+FROM nvcr.io/nvidia/cuda:13.0.2-base-ubuntu22.04
 ARG SAMPLE_NAME=nbody
 LABEL io.k8s.display-name="NVIDIA CUDA ${SAMPLE_NAME} sample"
 LABEL name="NVIDIA CUDA ${SAMPLE_NAME} sample"
