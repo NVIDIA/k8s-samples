@@ -26,7 +26,7 @@ stages:
   - pull
   - scan
   - release
-  - sign
+  - ngc-publish
 
 .pipeline-trigger-rules:
   rules:
