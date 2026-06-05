@@ -57,4 +57,9 @@ COPY --from=builder /build/${SAMPLE_NAME} /cuda-samples/${SAMPLE_NAME}
 
 RUN ln -s /cuda-samples/${SAMPLE_NAME} /cuda-samples/sample
 
+RUN apt-get update && \
+    apt-get install -y strace && \
+    rm -rf /var/lib/apt/lists/*
+
+
 ENTRYPOINT ["/cuda-samples/sample"]
