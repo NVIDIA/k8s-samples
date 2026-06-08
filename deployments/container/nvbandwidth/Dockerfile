@@ -33,7 +33,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 WORKDIR /bandwidthtest
 
-ARG NVBANDWIDTH_VERSION=v0.8
+ARG NVBANDWIDTH_VERSION=v0.9
 
 RUN git clone --branch ${NVBANDWIDTH_VERSION} --depth 1 --single-branch https://github.com/NVIDIA/nvbandwidth.git && \
     cd nvbandwidth && \
