@@ -42,7 +42,7 @@ jobs:
         - vulkan
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         name: Check out code
 
       - name: Set up QEMU
